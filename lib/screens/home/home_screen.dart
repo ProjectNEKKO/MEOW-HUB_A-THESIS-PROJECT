@@ -22,24 +22,51 @@ class HomeScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(title: const Text("Home")),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                "Welcome to Pusa App 🐾",
-                style: TextStyle(fontSize: 20),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(AuthLogoutRequested());
-                },
-                child: const Text("Logout"),
-              ),
-            ],
-          ),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 600) {
+              return _buildHomeContent(context, false);
+            } else {
+              return Row(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "🐾 Pusa App",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildHomeContent(context, true),
+                  ),
+                ],
+              );
+            }
+          },
         ),
+      ),
+    );
+  }
+
+  Widget _buildHomeContent(BuildContext context, bool isTablet) {
+    return Padding(
+      padding: EdgeInsets.all(isTablet ? 32 : 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            "Welcome to Pusa App 🐾",
+            style: TextStyle(fontSize: 20),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(AuthLogoutRequested());
+            },
+            child: const Text("Logout"),
+          ),
+        ],
       ),
     );
   }

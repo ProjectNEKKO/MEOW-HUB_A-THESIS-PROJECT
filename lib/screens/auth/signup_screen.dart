@@ -32,43 +32,74 @@ class SignupScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(title: const Text("Sign Up")),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-              ),
-              TextField(
-                controller: passwordController,
-                decoration: const InputDecoration(labelText: "Password"),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(
-                    AuthSignupRequested(
-                      emailController.text.trim(), 
-                      passwordController.text.trim(),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 600) {
+              return _buildSignupForm(context, emailController, passwordController, false);
+            } else {
+              return Row(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        "🐾 Create Your Pusa Account",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
                     ),
-                  );
-                },
-                child: const Text("Sign Up"),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Already have an account? Login"),
-              ),
-            ],
-          ),
+                  ),
+                  Expanded(
+                    child: _buildSignupForm(context, emailController, passwordController, true),
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ),
     );  
+  }
+
+  Widget _buildSignupForm(
+    BuildContext context,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+    bool isTablet,
+  ) {
+    return Padding(
+      padding: EdgeInsets.all(isTablet ? 32 : 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextField(
+            controller: emailController,
+            decoration: const InputDecoration(labelText: "Email"),
+          ),
+          TextField(
+            controller: passwordController,
+            decoration: const InputDecoration(labelText: "Password"),
+            obscureText: true,
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              context.read<AuthBloc>().add(
+                AuthSignupRequested(
+                  emailController.text.trim(),
+                  passwordController.text.trim(),
+                ),
+              );
+            },
+            child: const Text("Sign Up"),
+          ),
+          const SizedBox(height: 10),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Already have an account? Login"),
+          ),
+        ],
+      ),
+    );
   }
 }
