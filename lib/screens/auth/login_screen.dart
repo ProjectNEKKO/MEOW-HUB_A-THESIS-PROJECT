@@ -32,9 +32,9 @@ class _LoginScreenState extends State<LoginScreen> {
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
-        } else if (state is AuthUnauthenticated) {
+        } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Invalid Credentials")),
+            SnackBar(content: Text(state.message)),
           );
         }
       },
@@ -43,33 +43,31 @@ class _LoginScreenState extends State<LoginScreen> {
         body: LayoutBuilder(
           builder: (context, constraints) {
             final isTablet = constraints.maxWidth >= 600;
-            if (!isTablet) {
-              return LoginForm(
-                emailController: emailController,
-                passwordController: passwordController,
-                isTablet: false,
-              );
-            } else {
-              return Row(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        "🐾 Welcome Back!",
-                        style: Theme.of(context).textTheme.headlineMedium,
+            return isTablet
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "🐾 Welcome Back!",
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: LoginForm(
-                      emailController: emailController,
-                      passwordController: passwordController,
-                      isTablet: true,
-                    ),
-                  ),
-                ],
-              );
-            }
+                      Expanded(
+                        child: LoginForm(
+                          emailController: emailController,
+                          passwordController: passwordController,
+                          isTablet: true,
+                        ),
+                      ),
+                    ],
+                  )
+                : LoginForm(
+                    emailController: emailController,
+                    passwordController: passwordController,
+                    isTablet: false,
+                  );
           },
         ),
       ),

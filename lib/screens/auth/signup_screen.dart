@@ -14,15 +14,16 @@ class SignupScreen extends StatelessWidget {
     final passwordController = TextEditingController();
 
     return BlocListener<AuthBloc, AuthState>(
+      listenWhen: (previous, current) {
+        // Only listen when the state actually changed to AuthError
+        return current is AuthError && previous != current;
+      },
+
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           Navigator.pushReplacement(
-            context, 
+            context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
-        } else if (state is AuthUnauthenticated) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Signup Failed!")),
           );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -35,36 +36,34 @@ class SignupScreen extends StatelessWidget {
         body: LayoutBuilder(
           builder: (context, constraints) {
             final isTablet = constraints.maxWidth >= 600;
-            if (!isTablet) {
-              return SignupForm(
-                emailController: emailController,
-                passwordController: passwordController,
-                isTablet: false,
-              );
-            } else {
-              return Row(
-                children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        "🐾 Create Your Pusa Account",
-                        style: Theme.of(context).textTheme.headlineMedium,
+            return isTablet
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            "🐾 Create Your Pusa Account",
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    child: SignupForm(
-                      emailController: emailController,
-                      passwordController: passwordController,
-                      isTablet: true,
-                    ),
-                  ),
-                ],
-              );
-            }
+                      Expanded(
+                        child: SignupForm(
+                          emailController: emailController,
+                          passwordController: passwordController,
+                          isTablet: true,
+                        ),
+                      ),
+                    ],
+                  )
+                : SignupForm(
+                    emailController: emailController,
+                    passwordController: passwordController,
+                    isTablet: false,
+                  );
           },
         ),
       ),
-    );  
+    );
   }
 }

@@ -13,8 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogoutRequested>(_onLogout);
   }
 
-  Future<void> _onLogin(
-      AuthLoginRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogin(AuthLoginRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
@@ -22,13 +21,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
       );
       emit(AuthAuthenticated(userCredential.user!.uid));
-    } on FirebaseAuthException catch (e) {
-      emit(AuthError(e.message ?? "Login failed"));
+    } catch (_) {
+      emit(const AuthError("Login failed. Please check your credentials."));
     }
   }
 
-  Future<void> _onSignup(
-      AuthSignupRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onSignup(AuthSignupRequested event, Emitter<AuthState> emit) async {
     emit(const AuthLoading());
     try {
       final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
@@ -36,9 +34,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
       );
       emit(AuthAuthenticated(userCredential.user!.uid));
-    } on FirebaseAuthException catch (e) {
-      emit(AuthError(e.message ?? "Signup failed"));
-      emit(const AuthUnauthenticated());
+    } catch (_) {
+      emit(const AuthError("Signup failed. Please try again."));
     }
   }
 
