@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/screens/onboarding/intro_screen.dart';
-import 'blocs/auth/auth_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -12,12 +15,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // BlocProvider at the top level so ALL routes can access AuthBloc
     return BlocProvider(
       create: (_) => AuthBloc(),
       child: MaterialApp(
         title: 'Pusa Smart Litter',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: const IntroScreen()
+        home: const IntroScreen(),
       ),
     );
   }

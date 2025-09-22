@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_event.dart';
+import 'package:pusa_app/screens/auth/signup_screen.dart';
 
 class LoginForm extends StatelessWidget {
   final TextEditingController emailController;
@@ -43,6 +44,18 @@ class LoginForm extends StatelessWidget {
             },
             child: const Text("Login"),
           ),
+
+          const SizedBox(height: 30),
+
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SignupScreen()),
+              );
+            }, 
+            child: const Text("Don't have an account? Sign up")
+          )
         ],
       ),
     );
