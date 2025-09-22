@@ -38,6 +38,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   Expanded(
+                    flex: 1,
                     child: _buildHomeContent(context, true),
                   ),
                 ],
