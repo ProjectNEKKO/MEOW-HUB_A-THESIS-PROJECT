@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "694675196643",
+    "project_id": "pusa-app-e12d3",
+    "storage_bucket": "pusa-app-e12d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694675196643:android:d483d5afcba015420353d6",
+        "android_client_info": {
+          "package_name": "com.example.pusa_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDGMsnN0O4uPXy5wj7TBm9Ss-d_Cg-eEc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

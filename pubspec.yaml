@@ -1,0 +1,27 @@
+name: pusa_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  #FIREBASE
+  firebase_core: ^4.1.0
+  firebase_auth: ^6.0.2
+
+  #BLOC
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
