@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
+import 'package:pusa_app/blocs/auth/auth_event.dart';
+import 'package:pusa_app/screens/auth/signup_screen.dart';
 import 'package:pusa_app/screens/home/home_screen.dart';
-import 'package:pusa_app/widgets/auth/login_form.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,41 +35,70 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
+            const SnackBar(content: Text("Login failed, check credentials")),
           );
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Login")),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final isTablet = constraints.maxWidth >= 600;
-            return isTablet
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            "🐾 Welcome Back!",
-                            style: Theme.of(context).textTheme.headlineMedium,
-                          ),
-                        ),
+        body: Row(
+          children: [
+            // Left side panel (branding / welcome message)
+            Expanded(
+              child: Center(
+                child: Text(
+                  "🐾 Welcome Back to Pusa",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+            ),
+            // Right side panel (form)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(48.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(labelText: "Email"),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(labelText: "Password"),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                              AuthLoginRequested(
+                                emailController.text.trim(),
+                                passwordController.text.trim(),
+                              ),
+                            );
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        child: Text("Login"),
                       ),
-                      Expanded(
-                        child: LoginForm(
-                          emailController: emailController,
-                          passwordController: passwordController,
-                          isTablet: true,
-                        ),
-                      ),
-                    ],
-                  )
-                : LoginForm(
-                    emailController: emailController,
-                    passwordController: passwordController,
-                    isTablet: false,
-                  );
-          },
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignupScreen()),
+                        );
+                      },
+                      child: const Text("Don’t have an account? Sign up"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

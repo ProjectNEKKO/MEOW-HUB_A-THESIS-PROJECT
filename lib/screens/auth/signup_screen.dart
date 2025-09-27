@@ -2,23 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
+import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/screens/home/home_screen.dart';
-import 'package:pusa_app/widgets/auth/signup_form.dart';
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
 
   @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-
     return BlocListener<AuthBloc, AuthState>(
-      listenWhen: (previous, current) {
-        // Only listen when the state actually changed to AuthError
-        return current is AuthError && previous != current;
-      },
-
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           Navigator.pushReplacement(
@@ -27,41 +34,67 @@ class SignupScreen extends StatelessWidget {
           );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
+            const SnackBar(content: Text("Signup failed")),
           );
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Sign Up")),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final isTablet = constraints.maxWidth >= 600;
-            return isTablet
-                ? Row(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            "🐾 Create Your Pusa Account",
-                            style: Theme.of(context).textTheme.headlineMedium,
-                          ),
-                        ),
+        body: Row(
+          children: [
+            // Left branding / intro
+            Expanded(
+              child: Center(
+                child: Text(
+                  "🐾 Create Your Pusa Account",
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+            ),
+            // Right form
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(48.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(labelText: "Email"),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: passwordController,
+                      decoration: const InputDecoration(labelText: "Password"),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<AuthBloc>().add(
+                              AuthSignupRequested(
+                                emailController.text.trim(),
+                                passwordController.text.trim(),
+                              ),
+                            );
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        child: Text("Sign Up"),
                       ),
-                      Expanded(
-                        child: SignupForm(
-                          emailController: emailController,
-                          passwordController: passwordController,
-                          isTablet: true,
-                        ),
-                      ),
-                    ],
-                  )
-                : SignupForm(
-                    emailController: emailController,
-                    passwordController: passwordController,
-                    isTablet: false,
-                  );
-          },
+                    ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Already have an account? Login"),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
