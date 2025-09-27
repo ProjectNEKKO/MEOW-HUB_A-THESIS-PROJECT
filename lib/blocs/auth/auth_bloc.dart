@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
-class AuthCheckStatus extends AuthEvent {}
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -12,7 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLoginRequested>(_onLogin);
     on<AuthSignupRequested>(_onSignup);
     on<AuthLogoutRequested>(_onLogout);
-    on<AuthCheckStatus>(_onCheckStatus);
+    on<AuthCheckRequested>(_onCheckStatus);
   }
 
   Future<void> _onLogin(AuthLoginRequested event, Emitter<AuthState> emit) async {
@@ -41,13 +40,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onLogout(
-      AuthLogoutRequested event, Emitter<AuthState> emit) async {
+  Future<void> _onLogout(AuthLogoutRequested event, Emitter<AuthState> emit) async {
     await _firebaseAuth.signOut();
     emit(const AuthUnauthenticated());
   }
 
-  Future<void> _onCheckStatus(AuthCheckStatus event, Emitter<AuthState> emit) async {
+  Future<void> _onCheckStatus(AuthCheckRequested event, Emitter<AuthState> emit) async {
     final user = _firebaseAuth.currentUser;
     if (user != null) {
       emit(AuthAuthenticated(user.uid));
