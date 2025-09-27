@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pusa_app/screens/auth/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -24,6 +25,17 @@ class _IntroScreenState extends State<IntroScreen> {
     "Track and analyze your cat’s litter data.",
   ];
 
+  Future<void> _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenOnboarding', true);
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
+
   void _nextPage() {
     if (_currentPage < _titles.length - 1) {
       _controller.nextPage(
@@ -31,10 +43,7 @@ class _IntroScreenState extends State<IntroScreen> {
         curve: Curves.easeIn,
       );
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+      _completeOnboarding();
     }
   }
 
