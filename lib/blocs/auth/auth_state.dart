@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
-
 import 'package:pusa_app/models/app_user.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();
+
   @override
   List<Object?> get props => [];
 }
@@ -18,6 +18,7 @@ class AuthLoading extends AuthState {
 
 class AuthAuthenticated extends AuthState {
   final AppUser user; 
+
   const AuthAuthenticated(this.user);
 
   @override
@@ -27,6 +28,7 @@ class AuthAuthenticated extends AuthState {
 class AuthUnauthenticated extends AuthState {
   const AuthUnauthenticated();
 }
+
 class AuthError extends AuthState {
   final String message;
   const AuthError(this.message);

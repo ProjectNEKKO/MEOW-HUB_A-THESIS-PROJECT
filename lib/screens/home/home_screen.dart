@@ -53,21 +53,33 @@ class HomeScreen extends StatelessWidget {
   Widget _buildHomeContent(BuildContext context, bool isTablet) {
     return Padding(
       padding: EdgeInsets.all(isTablet ? 32 : 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            "Welcome to Pusa App 🐾",
-            style: TextStyle(fontSize: 20),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(AuthLogoutRequested());
-            },
-            child: const Text("Logout"),
-          ),
-        ],
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state is AuthAuthenticated) {
+            final displayName = state.user.catName ?? state.user.email;
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Welcome, $displayName 🐾",
+                  style: const TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    context.read<AuthBloc>().add(AuthLogoutRequested());
+                  },
+                  child: const Text("Logout"),
+                ),
+              ],
+            );
+          } else if (state is AuthLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return const Text("Loading user data...");
+          }
+        },
       ),
     );
   }
