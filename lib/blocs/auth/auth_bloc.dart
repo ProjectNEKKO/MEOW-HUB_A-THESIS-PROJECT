@@ -1,11 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   AuthBloc() : super(const AuthInitial()) {
     on<AuthLoginRequested>(_onLogin);
@@ -34,6 +36,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
+
+      final user = userCredential.user;
+      if (user != null) {
+        await _firestore.collection('users').doc(user.uid).set({
+          'email': event.email,
+          'createdAt': FieldValue.serverTimestamp(),
+          'introCompleted': true, 
+          'catName': null,
+        });
+      }
       emit(AuthAuthenticated(userCredential.user!.uid));
     } catch (_) {
       emit(const AuthError("Signup failed. Please try again."));
