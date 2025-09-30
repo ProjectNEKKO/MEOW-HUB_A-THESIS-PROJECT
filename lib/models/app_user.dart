@@ -5,33 +5,49 @@ class AppUser {
   final String email;
   final String? catName;
   final bool introCompleted;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   AppUser({
     required this.uid,
     required this.email,
     this.catName,
     this.introCompleted = false,
-    required this.createdAt,
+    this.createdAt,
   });
 
-  factory AppUser.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data()!;
+  factory AppUser.fromMap(String uid, Map<String, dynamic> data) {
+    final created = data['createdAt'];
+
+    DateTime? createdAt;
+    if (created is Timestamp) {
+      createdAt = created.toDate();
+    } else if (created is DateTime) {
+      createdAt = created;
+    } else if (created is String) {
+      createdAt = DateTime.tryParse(created);
+    } else {
+      createdAt = null;
+    }
+
     return AppUser(
-      uid: doc.id,
-      email: data['email'] ?? '',
-      catName: data['catName'],
-      introCompleted: data['introCompleted'] ?? false,
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      uid: uid,
+      email: (data['email'] ?? '') as String,
+      catName: data['catName'] as String?,
+      introCompleted: (data['introCompleted'] ?? false) as bool,
+      createdAt: createdAt,
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  factory AppUser.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    return AppUser.fromMap(doc.id, doc.data() ?? {});
+  }
+
+  Map<String, dynamic> toMap() {
     return {
       'email': email,
       'catName': catName,
       'introCompleted': introCompleted,
-      'createdAt': createdAt,
+      if (createdAt != null) 'createdAt': createdAt,
     };
   }
 }

@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import 'package:pusa_app/models/app_user.dart';
+
 abstract class AuthState extends Equatable {
   const AuthState();
   @override
@@ -15,17 +17,16 @@ class AuthLoading extends AuthState {
 }
 
 class AuthAuthenticated extends AuthState {
-  final String userId; // or email - whichever you prefer to carry
-  const AuthAuthenticated(this.userId);
+  final AppUser user; 
+  const AuthAuthenticated(this.user);
 
   @override
-  List<Object?> get props => [userId];
+  List<Object?> get props => [user];
 }
 
 class AuthUnauthenticated extends AuthState {
   const AuthUnauthenticated();
 }
-
 class AuthError extends AuthState {
   final String message;
   const AuthError(this.message);
