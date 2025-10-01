@@ -4,6 +4,7 @@ import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/screens/home/home_screen.dart';
+import 'package:pusa_app/screens/onboarding/cat_setup_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -32,9 +33,14 @@ class _SignupScreenState extends State<SignupScreen> {
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
+        } else if (state is AuthProfileIncomplete) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const CatSetupScreen()),
+          );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Signup failed")),
+            SnackBar(content: Text(state.message)),
           );
         }
       },

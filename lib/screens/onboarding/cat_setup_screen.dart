@@ -47,16 +47,13 @@ class _CatSetupScreenState extends State<CatSetupScreen> {
         'introCompleted': true,
       };
 
-      // Merge: preserves any existing fields in the users/{uid} doc.
       await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .set(updates, SetOptions(merge: true));
 
-      // tell AuthBloc to refresh profile from Firestore
       context.read<AuthBloc>().add(const AuthCheckRequested());
 
-      // Navigate to Home (replacement so back doesn't return here)
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -72,7 +69,6 @@ class _CatSetupScreenState extends State<CatSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Simple centered card layout — tablet-friendly
     return Scaffold(
       appBar: AppBar(title: const Text('Set up your cat')),
       body: Center(

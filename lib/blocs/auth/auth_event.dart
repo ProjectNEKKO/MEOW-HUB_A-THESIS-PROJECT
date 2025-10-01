@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:pusa_app/models/app_user.dart';
 
 abstract class AuthEvent extends Equatable {
   const AuthEvent();
@@ -30,4 +31,12 @@ class AuthLogoutRequested extends AuthEvent {
 
 class AuthCheckRequested extends AuthEvent {
   const AuthCheckRequested();
+}
+
+class UpdateProfileRequested extends AuthEvent {  
+  final AppUser updatedUser;
+  const UpdateProfileRequested(this.updatedUser);
+
+  @override
+  List<Object?> get props => [updatedUser];
 }

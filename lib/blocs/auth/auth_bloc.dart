@@ -15,6 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthSignupRequested>(_onSignup);
     on<AuthLogoutRequested>(_onLogout);
     on<AuthCheckRequested>(_onCheckStatus);
+    on<UpdateProfileRequested>(_onUpdateProfile);
   }
 
   Future<AppUser?> _fetchUserProfile(String uid) async {
@@ -59,7 +60,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       final uid = userCredential.user!.uid;
 
-      // Create document with serverTimestamp
       await _firestore.collection("users").doc(uid).set({
         "email": event.email,
         "introCompleted": false,
@@ -67,11 +67,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         "catName": null,
       });
 
-      // Re-fetch to convert timestamp properly
       final profile = await _fetchUserProfile(uid);
 
       if (profile != null) {
-        emit(AuthAuthenticated(profile));
+        if (profile.catName == null || profile.catName!.isEmpty) {
+          emit(AuthProfileIncomplete(profile));
+        } else {
+          emit(AuthAuthenticated(profile));
+        }
       } else {
         emit(const AuthError("Signup succeeded but profile creation failed."));
       }
@@ -93,7 +96,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final profile = await _fetchUserProfile(user.uid);
         if (profile != null) {
-          emit(AuthAuthenticated(profile));
+          if (profile.catName == null || profile.catName!.isEmpty) {
+            emit(AuthProfileIncomplete(profile));
+          } else {
+            emit(AuthAuthenticated(profile));
+          }
         } else {
           emit(const AuthUnauthenticated());
         }
@@ -102,6 +109,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } else {
       emit(const AuthUnauthenticated());
+    }
+  }
+
+  Future<void> _onUpdateProfile(
+      UpdateProfileRequested event, Emitter<AuthState> emit) async {
+    emit(const AuthLoading());
+    try {
+      await _firestore.collection("users").doc(event.updatedUser.uid).update({
+        "catName": event.updatedUser.catName,
+        "breed": event.updatedUser.breed,
+      });
+
+      emit(AuthAuthenticated(event.updatedUser));
+    } catch (_) {
+      emit(const AuthError("Failed to update profile."));
     }
   }
 }

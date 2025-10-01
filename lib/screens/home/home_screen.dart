@@ -4,6 +4,7 @@ import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/screens/auth/login_screen.dart';
+import 'package:pusa_app/screens/onboarding/cat_setup_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,6 +19,13 @@ class HomeScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const LoginScreen()),
             (route) => false,
           );
+        } else if (state is AuthAuthenticated) {
+            if (state.user.introCompleted == false) {
+              Navigator.pushReplacement(
+                context, 
+                MaterialPageRoute(builder: (_) => const CatSetupScreen())
+            );
+          }
         }
       },
       child: Scaffold(

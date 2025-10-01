@@ -4,6 +4,7 @@ class AppUser {
   final String uid;
   final String email;
   final String? catName;
+  final String? breed;
   final bool introCompleted;
   final DateTime? createdAt;
 
@@ -11,6 +12,7 @@ class AppUser {
     required this.uid,
     required this.email,
     this.catName,
+    this.breed,
     this.introCompleted = false,
     this.createdAt,
   });
