@@ -39,7 +39,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final profile = await _fetchUserProfile(uid);
 
       if (profile != null) {
-        emit(AuthAuthenticated(profile));
+        if (profile.introCompleted == true) {
+          emit(AuthAuthenticated(profile));
+        } else {
+          emit(AuthProfileIncomplete(profile));
+        }
       } else {
         emit(const AuthError("Profile not found. Please contact support."));
       }
@@ -65,16 +69,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         "introCompleted": false,
         "createdAt": FieldValue.serverTimestamp(),
         "catName": null,
+        "breed": null,
       });
 
       final profile = await _fetchUserProfile(uid);
 
       if (profile != null) {
-        if (profile.catName == null || profile.catName!.isEmpty) {
-          emit(AuthProfileIncomplete(profile));
-        } else {
-          emit(AuthAuthenticated(profile));
-        }
+        emit(AuthProfileIncomplete(profile)); // always incomplete on signup
       } else {
         emit(const AuthError("Signup succeeded but profile creation failed."));
       }
@@ -96,10 +97,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final profile = await _fetchUserProfile(user.uid);
         if (profile != null) {
-          if (profile.catName == null || profile.catName!.isEmpty) {
-            emit(AuthProfileIncomplete(profile));
-          } else {
+          if (profile.introCompleted == true) {
             emit(AuthAuthenticated(profile));
+          } else {
+            emit(AuthProfileIncomplete(profile));
           }
         } else {
           emit(const AuthUnauthenticated());
@@ -113,17 +114,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onUpdateProfile(
-      UpdateProfileRequested event, Emitter<AuthState> emit) async {
-    emit(const AuthLoading());
-    try {
-      await _firestore.collection("users").doc(event.updatedUser.uid).update({
-        "catName": event.updatedUser.catName,
-        "breed": event.updatedUser.breed,
-      });
+    UpdateProfileRequested event, Emitter<AuthState> emit) async {
+  emit(const AuthLoading());
+  try {
+    await _firestore.collection("users").doc(event.updatedUser.uid).update({
+      "catName": event.updatedUser.catName,
+      "breed": event.updatedUser.breed,
+      "introCompleted": true, // ✅ ensure completed
+    });
 
-      emit(AuthAuthenticated(event.updatedUser));
-    } catch (_) {
-      emit(const AuthError("Failed to update profile."));
+    // fetch updated profile from Firestore to be 100% consistent
+    final updatedProfile = await _fetchUserProfile(event.updatedUser.uid);
+
+    if (updatedProfile != null) {
+      emit(AuthAuthenticated(updatedProfile));
+    } else {
+      emit(const AuthError("Profile updated but could not fetch new data."));
     }
+  } catch (e) {
+    emit(const AuthError("Failed to update profile."));
   }
+}
 }
