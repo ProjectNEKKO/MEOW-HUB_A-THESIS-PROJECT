@@ -4,6 +4,7 @@ class AppUser {
   final String uid;
   final String email;
   final String? catName;
+  final String? breed;
   final bool introCompleted;
   final DateTime? createdAt;
 
@@ -11,6 +12,7 @@ class AppUser {
     required this.uid,
     required this.email,
     this.catName,
+    this.breed,
     this.introCompleted = false,
     this.createdAt,
   });
@@ -25,14 +27,13 @@ class AppUser {
       createdAt = created;
     } else if (created is String) {
       createdAt = DateTime.tryParse(created);
-    } else {
-      createdAt = null;
     }
 
     return AppUser(
       uid: uid,
-      email: (data['email'] ?? '') as String,
+      email: data['email'] is String ? data['email'] as String : '',
       catName: data['catName'] as String?,
+      breed: data['breed'] as String?,
       introCompleted: (data['introCompleted'] ?? false) as bool,
       createdAt: createdAt,
     );
@@ -46,8 +47,28 @@ class AppUser {
     return {
       'email': email,
       'catName': catName,
+      'breed': breed,
       'introCompleted': introCompleted,
-      if (createdAt != null) 'createdAt': createdAt,
+      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
     };
+  }
+
+  /// ✅ copyWith method for state updates
+  AppUser copyWith({
+    String? uid,
+    String? email,
+    String? catName,
+    String? breed,
+    bool? introCompleted,
+    DateTime? createdAt,
+  }) {
+    return AppUser(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      catName: catName ?? this.catName,
+      breed: breed ?? this.breed,
+      introCompleted: introCompleted ?? this.introCompleted,
+      createdAt: createdAt ?? this.createdAt,
+    );
   }
 }
