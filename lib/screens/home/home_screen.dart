@@ -4,10 +4,16 @@ import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/screens/auth/login_screen.dart';
-import 'package:pusa_app/screens/onboarding/cat_setup_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -19,75 +25,93 @@ class HomeScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const LoginScreen()),
             (route) => false,
           );
-        } else if (state is AuthAuthenticated) {
-            if (state.user.introCompleted == false) {
-              Navigator.pushReplacement(
-                context, 
-                MaterialPageRoute(builder: (_) => const CatSetupScreen())
-            );
-          }
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text("Home")),
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth < 600) {
-              return _buildHomeContent(context, false);
-            } else {
-              return Row(
+        body: Row(
+          children: [
+            NavigationRail(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              labelType: NavigationRailLabelType.all,
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.dashboard),
+                  label: Text("Dashboard"),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.pets),
+                  label: Text("Cat Profile"),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.restaurant),
+                  label: Text("Feeding"),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.delete),
+                  label: Text("Litter Box"),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.list),
+                  label: Text("Activity Logs"),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.settings),
+                  label: Text("Settings"),
+                ),
+              ],
+            ),
+            const VerticalDivider(thickness: 1, width: 1),
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
                 children: [
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        "🐾 Pusa App",
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: _buildHomeContent(context, true),
-                  ),
+                  _buildDashboard(context),
+                  const Center(child: Text("Cat Profile Page")),
+                  const Center(child: Text("Feeding Page")),
+                  const Center(child: Text("Litter Box Page")),
+                  const Center(child: Text("Activity Logs Page")),
+                  _buildSettings(context),
                 ],
-              );
-            }
-          },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildHomeContent(BuildContext context, bool isTablet) {
-    return Padding(
-      padding: EdgeInsets.all(isTablet ? 32 : 16),
-      child: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          if (state is AuthAuthenticated) {
-            final displayName = state.user.catName ?? state.user.email;
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Welcome, $displayName 🐾",
-                  style: const TextStyle(fontSize: 20),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<AuthBloc>().add(AuthLogoutRequested());
-                  },
-                  child: const Text("Logout"),
-                ),
-              ],
-            );
-          } else if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else {
-            return const Text("Loading user data...");
-          }
+  Widget _buildDashboard(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthAuthenticated) {
+          final displayName = state.user.catName ?? state.user.email;
+          return Center(
+            child: Text(
+              "Welcome, $displayName 🐾",
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          );
+        } else if (state is AuthLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return const Center(child: Text("Loading user data..."));
+        }
+      },
+    );
+  }
+
+  Widget _buildSettings(BuildContext context) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () {
+          context.read<AuthBloc>().add(AuthLogoutRequested());
         },
+        child: const Text("Logout"),
       ),
     );
   }
