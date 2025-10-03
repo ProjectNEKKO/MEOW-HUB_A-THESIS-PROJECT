@@ -7,6 +7,7 @@ import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/screens/auth/login_screen.dart';
+import 'package:pusa_app/screens/home/dashboard_screen.dart';
 
 import 'cat_profile_screen.dart';
 import 'feeding_screen.dart';
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
+    DashboardScreen(),
     CatProfileScreen(),
     FeedingScreen(),
     HydrationScreen(),
@@ -84,6 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.dashboard),
+                  label: Text("Home"),
+                ),
                 NavigationRailDestination(
                   icon: Icon(Icons.pets),
                   label: Text("Cat Profile"),
