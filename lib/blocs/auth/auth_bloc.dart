@@ -68,14 +68,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         "email": event.email,
         "introCompleted": false,
         "createdAt": FieldValue.serverTimestamp(),
-        "catName": null,
-        "breed": null,
+      });
+
+      final defaultCatRef =
+        _firestore.collection("users").doc(uid).collection("cats").doc();
+
+      await defaultCatRef.set({
+        "name": "My Cat",
+        "breed": "Unknown",
+        "age": null,
+        "photoUrl": null,
+        "createdAt": FieldValue.serverTimestamp(),
       });
 
       final profile = await _fetchUserProfile(uid);
 
       if (profile != null) {
-        emit(AuthProfileIncomplete(profile)); // always incomplete on signup
+        emit(AuthProfileIncomplete(profile)); 
       } else {
         emit(const AuthError("Signup succeeded but profile creation failed."));
       }
@@ -118,12 +127,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   emit(const AuthLoading());
   try {
     await _firestore.collection("users").doc(event.updatedUser.uid).update({
-      "catName": event.updatedUser.catName,
-      "breed": event.updatedUser.breed,
-      "introCompleted": true, // ✅ ensure completed
+      "introCompleted": true, 
     });
 
-    // fetch updated profile from Firestore to be 100% consistent
     final updatedProfile = await _fetchUserProfile(event.updatedUser.uid);
 
     if (updatedProfile != null) {
