@@ -1,7 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
-import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/models/app_user.dart';
 import 'package:pusa_app/screens/home/home_screen.dart';
@@ -26,18 +26,42 @@ class _CatSetupScreenState extends State<CatSetupScreen> {
     super.dispose();
   }
 
-  void _saveProfile(AppUser currentUser) {
+  void _saveProfile(AppUser currentUser) async {
     if (!_formKey.currentState!.validate()) return;
-
-    final updatedUser = currentUser.copyWith(
-      catName: _nameCtrl.text.trim(),
-      breed: _breedCtrl.text.trim().isEmpty ? null : _breedCtrl.text.trim(),
-      introCompleted: true,
-    );
 
     setState(() => _isSaving = true);
 
-    context.read<AuthBloc>().add(UpdateProfileRequested(updatedUser));
+    try {
+      final userRef =
+          FirebaseFirestore.instance.collection("users").doc(currentUser.uid);
+
+      final catsRef = userRef.collection("cats");
+
+      final snapshot = await catsRef.limit(1).get();
+      if (snapshot.docs.isNotEmpty) {
+        final catDoc = snapshot.docs.first.reference;
+
+        await catDoc.update({
+          "name": _nameCtrl.text.trim(),
+          "breed": _breedCtrl.text.trim().isEmpty ? "Unknown" : _breedCtrl.text.trim(),
+          "updatedAt": FieldValue.serverTimestamp(),
+        });
+      }
+
+      await userRef.update({"introCompleted": true});
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      setState(() => _isSaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to save cat: $e")),
+      );
+    }
   }
 
   @override

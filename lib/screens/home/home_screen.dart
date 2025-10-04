@@ -4,13 +4,14 @@ import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/screens/auth/login_screen.dart';
+import 'package:pusa_app/screens/home/dashboard_screen.dart';
 
-import 'cat_profile_screen.dart';
+import '../cats/cat_profile_screen.dart';
 import 'feeding_screen.dart';
 import 'hydration_screen.dart';
 import 'litter_screen.dart';
-import 'logs_screen.dart';
-import 'settings_screen.dart';
+import '../logs/logs_screen.dart';
+import '../settings/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
+    DashboardScreen(),
     CatProfileScreen(),
     FeedingScreen(),
     HydrationScreen(),
@@ -36,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthUnauthenticated) {
-          // ✅ Redirect to Login when logged out
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -47,31 +48,27 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         body: Row(
           children: [
+            // ✅ Left Navigation Rail
             NavigationRail(
               selectedIndex: _selectedIndex,
               onDestinationSelected: (index) {
                 setState(() => _selectedIndex = index);
               },
               labelType: NavigationRailLabelType.all,
-
-              // ✅ Header
               leading: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: const [
                     Icon(Icons.pets, size: 40, color: Colors.purple),
                     SizedBox(height: 8),
-                    Text(
-                      "Pusa App",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    Text("Pusa App", style: TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
               trailing: Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min, // ✅ prevent overflow
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       icon: const Icon(Icons.logout, color: Colors.red),
@@ -80,14 +77,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         context.read<AuthBloc>().add(AuthLogoutRequested());
                       },
                     ),
-                    const Text(
-                      "Logout",
-                      style: TextStyle(color: Colors.red, fontSize: 12),
-                    ),
+                    const Text("Logout", style: TextStyle(color: Colors.red, fontSize: 12)),
                   ],
                 ),
               ),
               destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.dashboard),
+                  label: Text("Home"),
+                ),
                 NavigationRailDestination(
                   icon: Icon(Icons.pets),
                   label: Text("Cat Profile"),
@@ -114,7 +112,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
+
             const VerticalDivider(width: 1),
+
+            // ✅ Main content
             Expanded(
               child: _pages[_selectedIndex],
             ),
