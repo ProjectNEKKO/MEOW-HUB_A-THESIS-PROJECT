@@ -216,10 +216,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                               : null,
                                         ),
                                         const SizedBox(height: 6),
-                                        Text(
-                                          cat["name"] ?? "Unnamed",
-                                          style: const TextStyle(fontSize: 12),
-                                          overflow: TextOverflow.ellipsis,
+                                        SizedBox(
+                                          width: 70, // constrain text width
+                                          child: Text(
+                                            cat["name"] ?? "Unnamed",
+                                            style: const TextStyle(fontSize: 12),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
+                                          ),
                                         ),
                                       ],
                                     ),
