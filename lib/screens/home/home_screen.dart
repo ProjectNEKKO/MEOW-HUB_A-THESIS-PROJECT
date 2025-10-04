@@ -9,13 +9,13 @@ import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/screens/auth/login_screen.dart';
 import 'package:pusa_app/screens/home/dashboard_screen.dart';
 
-import 'cat_profile_screen.dart';
+import '../cats/cat_profile_screen.dart';
 import 'feeding_screen.dart';
 import 'hydration_screen.dart';
 import 'litter_screen.dart';
-import 'logs_screen.dart';
-import 'settings_screen.dart';
-import 'cat_details_screen.dart';
+import '../logs/logs_screen.dart';
+import '../settings/settings_screen.dart';
+import '../cats/cat_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
