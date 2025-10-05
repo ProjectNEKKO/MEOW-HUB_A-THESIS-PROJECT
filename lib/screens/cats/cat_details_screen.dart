@@ -4,49 +4,62 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
+import 'package:pusa_app/screens/cats/edit_cat_screen.dart';
 
 class CatDetailsScreen extends StatelessWidget {
+  final String userId;
   final String catId;
-  const CatDetailsScreen({super.key, required this.catId});
+  final Map<String, dynamic>? catData;
+
+  const CatDetailsScreen({
+    super.key,
+    required this.userId,
+    required this.catId,
+    this.catData,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final userId = (context.read<AuthBloc>().state as AuthAuthenticated).user.uid;
+    final uid = (context.read<AuthBloc>().state as AuthAuthenticated).user.uid;
 
     return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8), // ✅ blur HomeScreen
+      filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
       child: Material(
-        color: Colors.black.withValues(alpha: 0.3), // ✅ translucent background
+        color: Colors.black.withValues(alpha: 0.3),
         child: DraggableScrollableSheet(
-          initialChildSize: 0.55, // start height
-          minChildSize: 0.4,      // how small it can shrink
-          maxChildSize: 0.9,      // how tall it can expand
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.9,
           builder: (context, scrollController) {
-            return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-              future: FirebaseFirestore.instance
-                  .collection("users")
-                  .doc(userId)
-                  .collection("cats")
-                  .doc(catId)
-                  .get(),
+            return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>?>(
+              future: catData == null
+                  ? FirebaseFirestore.instance
+                      .collection("users")
+                      .doc(uid)
+                      .collection("cats")
+                      .doc(catId)
+                      .get()
+                  : Future.value(null),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                final data = catData ?? snapshot.data?.data();
+
+                if (data == null && !snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                final data = snapshot.data!.data();
-                if (data == null) {
-                  return const Center(child: Text("Cat not found"));
-                }
+                final photoUrl = data?["photoUrl"]?.toString() ?? "";
+                final name = data?["name"]?.toString() ?? "Unknown Cat";
+                final breed = data?["breed"]?.toString() ?? "Unknown";
+                final age = data?["age"];
 
                 return Container(
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                   ),
                   child: ListView(
-                    controller: scrollController, // ✅ makes sheet draggable
-                    padding: const EdgeInsets.all(20),
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(24),
                     children: [
                       // Handle bar
                       Center(
@@ -64,44 +77,86 @@ class CatDetailsScreen extends StatelessWidget {
                       // Cat photo
                       Center(
                         child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: data["photoUrl"] != null
-                              ? NetworkImage(data["photoUrl"])
-                              : null,
-                          child: data["photoUrl"] == null
-                              ? const Icon(Icons.pets, size: 50)
+                          radius: 60,
+                          backgroundImage:
+                              (photoUrl.isNotEmpty) ? NetworkImage(photoUrl) : null,
+                          child: photoUrl.isEmpty
+                              ? const Icon(Icons.pets, size: 60)
                               : null,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
 
                       // Cat name
                       Center(
                         child: Text(
-                          data["name"] ?? "Unknown",
-                          style: Theme.of(context).textTheme.headlineSmall,
+                          name,
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                         ),
                       ),
                       const SizedBox(height: 8),
 
-                      // Cat details
+                      // Breed + Age
                       Center(
-                        child: Text("Breed: ${data['breed'] ?? 'Unknown'}"),
-                      ),
-                      if (data["age"] != null)
-                        Center(child: Text("Age: ${data['age']} years")),
-
-                      const SizedBox(height: 24),
-
-                      // Close button
-                      ElevatedButton.icon(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close),
-                        label: const Text("Close"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                          foregroundColor: Colors.white,
+                        child: Text(
+                          "Breed: $breed",
+                          style: const TextStyle(fontSize: 16),
                         ),
+                      ),
+                      if (age != null)
+                        Center(
+                          child: Text(
+                            "Age: $age years",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+
+                      const SizedBox(height: 32),
+
+                      // Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close),
+                            label: const Text("Close"),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => EditCatScreen(
+                                    userId: uid,
+                                    catId: catId,
+                                    initialName: name,
+                                    initialBreed: breed,
+                                    initialAge: age,
+                                    initialPhotoUrl: photoUrl,
+                                  ),
+                                ),
+                              );
+
+                              if (updated == true && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content:
+                                          Text("Cat updated successfully!")),
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.edit),
+                            label: const Text("Edit"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.purple,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

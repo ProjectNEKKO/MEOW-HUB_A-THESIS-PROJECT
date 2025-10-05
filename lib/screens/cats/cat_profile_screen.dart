@@ -5,6 +5,7 @@ import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/screens/cats/add_cat_screen.dart';
 import 'package:pusa_app/screens/cats/edit_cat_screen.dart';
+import 'package:pusa_app/screens/cats/cat_details_screen.dart';
 
 class CatProfileScreen extends StatelessWidget {
   const CatProfileScreen({super.key});
@@ -32,6 +33,7 @@ class CatProfileScreen extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               }
+
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return const Center(child: Text("No cats yet. Add one!"));
               }
@@ -41,13 +43,32 @@ class CatProfileScreen extends StatelessWidget {
               return ListView.builder(
                 itemCount: cats.length,
                 itemBuilder: (context, index) {
-                  final cat = cats[index].data() as Map<String, dynamic>;
+                  final catDoc = cats[index];
+                  final cat = catDoc.data() as Map<String, dynamic>;
+
                   return ListTile(
-                    leading: const Icon(Icons.pets, size: 32),
+                    leading: CircleAvatar(
+                      radius: 24,
+                      backgroundImage: cat["photoUrl"] != null && cat["photoUrl"].isNotEmpty
+                          ? NetworkImage(cat["photoUrl"])
+                          : null,
+                      child: cat["photoUrl"] == null || cat["photoUrl"].isEmpty
+                          ? const Icon(Icons.pets, size: 24)
+                          : null,
+                    ),
                     title: Text(cat["name"] ?? "Unnamed Cat"),
                     subtitle: Text(cat["breed"] ?? "Unknown Breed"),
                     onTap: () {
-                      // TODO: Navigate to CatDetailsScreen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CatDetailsScreen(
+                            userId: user.uid,
+                            catId: catDoc.id,
+                            catData: cat,
+                          ),
+                        ),
+                      );
                     },
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
@@ -55,7 +76,14 @@ class CatProfileScreen extends StatelessWidget {
                         final updated = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => EditCatScreen(catId: cats[index].id),
+                            builder: (_) => EditCatScreen(
+                              userId: user.uid,
+                              catId: catDoc.id,
+                              initialName: cat["name"] ?? "",
+                              initialBreed: cat["breed"],
+                              initialAge: cat["age"],
+                              initialPhotoUrl: cat["photoUrl"],
+                            ),
                           ),
                         );
 

@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart'; // for photo picker
 import 'dart:io';
 
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
+import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/models/app_user.dart';
 import 'package:pusa_app/screens/home/home_screen.dart';
@@ -83,9 +84,8 @@ class _CatSetupScreenState extends State<CatSetupScreen> {
       await userRef.update({"introCompleted": true});
 
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        context.read<AuthBloc>().add(
+          UpdateProfileRequested(currentUser),
         );
       }
     } catch (e) {

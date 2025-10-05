@@ -34,24 +34,30 @@ class DashboardScreen extends StatelessWidget {
                       .collection("cats")
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    final cats = snapshot.data!.docs;
-
-                    if (cats.isEmpty) {
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                       return const Center(
-                        child: Text("No cats yet. Add one in Cat Profile."),
+                        child: Text(
+                          "No cats yet. Add one in Cat Profile.",
+                          style: TextStyle(fontSize: 14),
+                        ),
                       );
                     }
+
+                    final cats = snapshot.data!.docs;
 
                     return ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: cats.length,
                       itemBuilder: (context, index) {
-                        final cat = cats[index].data() as Map<String, dynamic>;
+                        final data = cats[index].data() as Map<String, dynamic>?;
                         final catId = cats[index].id;
+
+                        final catName = data?["name"] as String? ?? "Unnamed";
+                        final photoUrl = data?["photoUrl"] as String?;
 
                         return GestureDetector(
                           onTap: () {
@@ -59,8 +65,7 @@ class DashboardScreen extends StatelessWidget {
                               context: context,
                               barrierDismissible: true,
                               barrierLabel: "Close",
-                              barrierColor:
-                                  Colors.black.withValues(alpha: 0.2), // overlay
+                              barrierColor: Colors.black.withValues(alpha: 0.2),
                               transitionDuration:
                                   const Duration(milliseconds: 250),
                               pageBuilder: (_, __, ___) {
@@ -77,7 +82,10 @@ class DashboardScreen extends StatelessWidget {
                                       alignment: Alignment.bottomCenter,
                                       child: FractionallySizedBox(
                                         heightFactor: 0.7,
-                                        child: CatDetailsScreen(catId: catId),
+                                        child: CatDetailsScreen(
+                                          userId: userId,
+                                          catId: catId,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -107,20 +115,21 @@ class DashboardScreen extends StatelessWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 35,
-                                  backgroundImage: cat["photoUrl"] != null
-                                      ? NetworkImage(cat["photoUrl"])
+                                  backgroundImage: (photoUrl != null &&
+                                          photoUrl.isNotEmpty)
+                                      ? NetworkImage(photoUrl)
                                       : null,
-                                  child: cat["photoUrl"] == null
+                                  child: (photoUrl == null || photoUrl.isEmpty)
                                       ? const Icon(Icons.pets, size: 35)
                                       : null,
                                 ),
                                 const SizedBox(height: 6),
                                 SizedBox(
-                                  width: 70, // keep text aligned
+                                  width: 70,
                                   child: Tooltip(
-                                    message: cat["name"] ?? "Unnamed",
+                                    message: catName,
                                     child: Text(
-                                      cat["name"] ?? "Unnamed",
+                                      catName,
                                       style: const TextStyle(fontSize: 12),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
