@@ -154,37 +154,51 @@ class DashboardScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // 🔹 Feeding Card
-              DashboardCard(
-                title: "Feeding",
-                subtitle: "Last meal: Today 8:30 AM",
-                icon: Icons.restaurant,
-                color: Colors.orange,
-                onTap: () {},
+              // 🟢 Litter Box - Centered and slightly larger
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.85,
+                  child: DashboardCard(
+                    title: "Litter Box",
+                    subtitle: "Last cleaned: Yesterday 6:00 PM",
+                    icon: Icons.cleaning_services,
+                    color: Colors.green,
+                    onTap: () {},
+                    isLarge: true,
+                  ),
+                ),
               ),
-              const SizedBox(height: 12),
 
-              // 🔹 Hydration Card
-              DashboardCard(
-                title: "Hydration",
-                subtitle: "Water level: 75%",
-                icon: Icons.water_drop,
-                color: Colors.blue,
-                onTap: () {},
+              const SizedBox(height: 16),
+
+              // 🍽️ Feeder + 💧 Hydration in same row
+              Row(
+                children: [
+                  Expanded(
+                    child: DashboardCard(
+                      title: "Feeding",
+                      subtitle: "Last meal: Today 8:30 AM",
+                      icon: Icons.restaurant,
+                      color: Colors.orange,
+                      onTap: () {},
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: DashboardCard(
+                      title: "Hydration",
+                      subtitle: "Water level: 75%",
+                      icon: Icons.water_drop,
+                      color: Colors.blue,
+                      onTap: () {},
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
 
-              // 🔹 Litter Box Card
-              DashboardCard(
-                title: "Litter Box",
-                subtitle: "Last cleaned: Yesterday 6:00 PM",
-                icon: Icons.cleaning_services,
-                color: Colors.green,
-                onTap: () {},
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
 
-              // 🔹 Logs / History Card
+              // 🕒 Logs / History Card
               DashboardCard(
                 title: "Activity Logs",
                 subtitle: "View feeding, hydration, and litter events",
@@ -206,6 +220,7 @@ class DashboardCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+  final bool isLarge; // 👈 Optional for larger cards
 
   const DashboardCard({
     super.key,
@@ -214,37 +229,50 @@ class DashboardCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.isLarge = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 3,
+      elevation: 4,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(isLarge ? 24.0 : 16.0),
           child: Row(
             children: [
               CircleAvatar(
-                radius: 28,
+                radius: isLarge ? 35 : 28,
                 backgroundColor: color.withAlpha(40),
-                child: Icon(icon, size: 28, color: color),
+                child: Icon(
+                  icon,
+                  size: isLarge ? 35 : 28,
+                  color: color,
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: isLarge ? 20 : 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const SizedBox(height: 4),
-                    Text(subtitle,
-                        style: TextStyle(
-                            fontSize: 14, color: Colors.grey.shade600)),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
                   ],
                 ),
               ),
