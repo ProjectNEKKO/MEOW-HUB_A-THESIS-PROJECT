@@ -14,6 +14,7 @@ dependencies:
   firebase_core: ^4.1.1
   firebase_auth: ^6.1.0
   cloud_firestore: ^6.0.2
+  firebase_storage: ^13.0.2
 
   #BLOC
   flutter_bloc: ^9.1.1
@@ -21,6 +22,9 @@ dependencies:
 
   #Shared Preferences
   shared_preferences: ^2.5.3
+
+  #Image Picker
+  image_picker: ^1.2.0
 
 dev_dependencies:
   flutter_test:
