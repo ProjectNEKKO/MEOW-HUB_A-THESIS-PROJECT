@@ -5,10 +5,16 @@ class LitterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        "🧹 Litter Content",
-        style: TextStyle(fontSize: 22),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Litter Box Details"),
+        backgroundColor: Colors.green,
+      ),
+      body: const Center(
+        child: Text(
+          "🧹 Litter Content",
+          style: TextStyle(fontSize: 22),
+        ),
       ),
     );
   }

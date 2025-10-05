@@ -5,6 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import '../cats/cat_details_screen.dart';
+import '../home/feeding_screen.dart';
+import '../home/hydration_screen.dart';
+import '../home/litter_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -19,208 +22,278 @@ class DashboardScreen extends StatelessWidget {
 
         final userId = state.user.uid;
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // 🔹 Cat Row
-              SizedBox(
-                height: 120,
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection("users")
-                      .doc(userId)
-                      .collection("cats")
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final screenHeight = constraints.maxHeight;
 
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return const Center(
-                        child: Text(
-                          "No cats yet. Add one in Cat Profile.",
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      );
-                    }
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: screenHeight),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 🐾 Cat Story Circles
+                    SizedBox(
+                      height: 120,
+                      child: StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection("users")
+                            .doc(userId)
+                            .collection("cats")
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
 
-                    final cats = snapshot.data!.docs;
+                          if (!snapshot.hasData ||
+                              snapshot.data!.docs.isEmpty) {
+                            return const Center(
+                              child: Text(
+                                "No cats yet. Add one in Cat Profile.",
+                                style: TextStyle(fontSize: 14),
+                              ),
+                            );
+                          }
 
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: cats.length,
-                      itemBuilder: (context, index) {
-                        final data = cats[index].data() as Map<String, dynamic>?;
-                        final catId = cats[index].id;
+                          final cats = snapshot.data!.docs;
 
-                        final catName = data?["name"] as String? ?? "Unnamed";
-                        final photoUrl = data?["photoUrl"] as String?;
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: cats.length,
+                            itemBuilder: (context, index) {
+                              final data =
+                                  cats[index].data() as Map<String, dynamic>?;
+                              final catId = cats[index].id;
 
-                        return GestureDetector(
-                          onTap: () {
-                            showGeneralDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              barrierLabel: "Close",
-                              barrierColor: Colors.black.withValues(alpha: 0.2),
-                              transitionDuration:
-                                  const Duration(milliseconds: 250),
-                              pageBuilder: (_, __, ___) {
-                                return Stack(
-                                  children: [
-                                    // Blur background
-                                    BackdropFilter(
-                                      filter:
-                                          ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                      child: Container(color: Colors.transparent),
-                                    ),
-                                    // Bottom popup
-                                    Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: FractionallySizedBox(
-                                        heightFactor: 0.7,
-                                        child: CatDetailsScreen(
-                                          userId: userId,
-                                          catId: catId,
+                              final catName =
+                                  data?["name"] as String? ?? "Unnamed";
+                              final photoUrl = data?["photoUrl"] as String? ?? "";
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    showGeneralDialog(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      barrierLabel: "Close",
+                                      barrierColor:
+                                          Colors.black.withOpacity(0.2),
+                                      transitionDuration:
+                                          const Duration(milliseconds: 250),
+                                      pageBuilder: (_, __, ___) {
+                                        return Stack(
+                                          children: [
+                                            BackdropFilter(
+                                              filter: ImageFilter.blur(
+                                                  sigmaX: 8, sigmaY: 8),
+                                              child: Container(
+                                                  color: Colors.transparent),
+                                            ),
+                                            Align(
+                                              alignment: Alignment.bottomCenter,
+                                              child: FractionallySizedBox(
+                                                heightFactor: 0.7,
+                                                child: CatDetailsScreen(
+                                                  userId: userId,
+                                                  catId: catId,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                      transitionBuilder:
+                                          (_, animation, __, child) {
+                                        final curved = CurvedAnimation(
+                                            parent: animation,
+                                            curve: Curves.easeOut);
+                                        return SlideTransition(
+                                          position: Tween<Offset>(
+                                            begin: const Offset(0, 1),
+                                            end: Offset.zero,
+                                          ).animate(curved),
+                                          child: FadeTransition(
+                                            opacity: curved,
+                                            child: child,
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Hero(
+                                        tag: catId,
+                                        child: AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          padding: const EdgeInsets.all(3),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(0xFF9C27B0),
+                                                Color(0xFFFF9800)
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.purple
+                                                    .withOpacity(0.3),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: CircleAvatar(
+                                            radius: 35,
+                                            backgroundImage:
+                                                (photoUrl.isNotEmpty)
+                                                    ? NetworkImage(photoUrl)
+                                                    : null,
+                                            child: (photoUrl.isEmpty)
+                                                ? const Icon(Icons.pets,
+                                                    size: 35)
+                                                : null,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                              transitionBuilder: (_, animation, __, child) {
-                                final curved = CurvedAnimation(
-                                    parent: animation, curve: Curves.easeOut);
-                                return SlideTransition(
-                                  position: Tween<Offset>(
-                                    begin: const Offset(0, 1),
-                                    end: Offset.zero,
-                                  ).animate(curved),
-                                  child: FadeTransition(
-                                    opacity: curved,
-                                    child: child,
+                                      const SizedBox(height: 6),
+                                      SizedBox(
+                                        width: 70,
+                                        child: Text(
+                                          catName,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                );
-                              },
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+                    const Text(
+                      "Dashboard Overview",
+                      style: TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 🧹 Litter Box - Center
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.85,
+                        child: DashboardCard(
+                          title: "Litter Box",
+                          subtitle: "Last cleaned: Yesterday 6:00 PM",
+                          icon: Icons.cleaning_services,
+                          color: Colors.green,
+                          isLarge: true,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const LitterScreen()),
                             );
                           },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 10),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircleAvatar(
-                                  radius: 35,
-                                  backgroundImage: (photoUrl != null &&
-                                          photoUrl.isNotEmpty)
-                                      ? NetworkImage(photoUrl)
-                                      : null,
-                                  child: (photoUrl == null || photoUrl.isEmpty)
-                                      ? const Icon(Icons.pets, size: 35)
-                                      : null,
-                                ),
-                                const SizedBox(height: 6),
-                                SizedBox(
-                                  width: 70,
-                                  child: Tooltip(
-                                    message: catName,
-                                    child: Text(
-                                      catName,
-                                      style: const TextStyle(fontSize: 12),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // 🍽️ Feeder + 💧 Hydration
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DashboardCard(
+                            title: "Feeding",
+                            subtitle: "Last meal: Today 8:30 AM",
+                            icon: Icons.restaurant,
+                            color: Colors.orange,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const FeedingScreen()),
+                              );
+                            },
                           ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: DashboardCard(
+                            title: "Hydration",
+                            subtitle: "Water level: 75%",
+                            icon: Icons.water_drop,
+                            color: Colors.blue,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const HydrationScreen()),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    DashboardCard(
+                      title: "Activity Logs",
+                      subtitle:
+                          "View feeding, hydration, and litter events",
+                      icon: Icons.history,
+                      color: Colors.purple,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text("Use the Logs tab to view history")),
                         );
                       },
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(height: 16),
-              const Text(
-                "Dashboard Overview",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-
-              // 🟢 Litter Box - Centered and slightly larger
-              Center(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.85,
-                  child: DashboardCard(
-                    title: "Litter Box",
-                    subtitle: "Last cleaned: Yesterday 6:00 PM",
-                    icon: Icons.cleaning_services,
-                    color: Colors.green,
-                    onTap: () {},
-                    isLarge: true,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // 🍽️ Feeder + 💧 Hydration in same row
-              Row(
-                children: [
-                  Expanded(
-                    child: DashboardCard(
-                      title: "Feeding",
-                      subtitle: "Last meal: Today 8:30 AM",
-                      icon: Icons.restaurant,
-                      color: Colors.orange,
-                      onTap: () {},
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DashboardCard(
-                      title: "Hydration",
-                      subtitle: "Water level: 75%",
-                      icon: Icons.water_drop,
-                      color: Colors.blue,
-                      onTap: () {},
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // 🕒 Logs / History Card
-              DashboardCard(
-                title: "Activity Logs",
-                subtitle: "View feeding, hydration, and litter events",
-                icon: Icons.history,
-                color: Colors.purple,
-                onTap: () {},
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
   }
 }
 
+// 📦 DashboardCard Widget (unchanged)
 class DashboardCard extends StatelessWidget {
   final String title;
   final String subtitle;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
-  final bool isLarge; // 👈 Optional for larger cards
+  final bool isLarge;
 
   const DashboardCard({
     super.key,
@@ -247,32 +320,21 @@ class DashboardCard extends StatelessWidget {
               CircleAvatar(
                 radius: isLarge ? 35 : 28,
                 backgroundColor: color.withAlpha(40),
-                child: Icon(
-                  icon,
-                  size: isLarge ? 35 : 28,
-                  color: color,
-                ),
+                child: Icon(icon, size: isLarge ? 35 : 28, color: color),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: isLarge ? 20 : 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    Text(title,
+                        style: TextStyle(
+                            fontSize: isLarge ? 20 : 18,
+                            fontWeight: FontWeight.bold)),
                     const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
+                    Text(subtitle,
+                        style: TextStyle(
+                            fontSize: 14, color: Colors.grey.shade600)),
                   ],
                 ),
               ),

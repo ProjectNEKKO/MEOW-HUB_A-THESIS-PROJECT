@@ -5,11 +5,7 @@ import 'package:pusa_app/blocs/auth/auth_event.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import 'package:pusa_app/screens/auth/login_screen.dart';
 import 'package:pusa_app/screens/home/dashboard_screen.dart';
-
 import '../cats/cat_profile_screen.dart';
-import 'feeding_screen.dart';
-import 'hydration_screen.dart';
-import 'litter_screen.dart';
 import '../logs/logs_screen.dart';
 import '../settings/settings_screen.dart';
 
@@ -26,9 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = const [
     DashboardScreen(),
     CatProfileScreen(),
-    FeedingScreen(),
-    HydrationScreen(),
-    LitterScreen(),
     LogsScreen(),
     SettingsScreen(),
   ];
@@ -48,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         body: Row(
           children: [
-            // ✅ Left Navigation Rail
+            // 🔹 Left Navigation
             NavigationRail(
               selectedIndex: _selectedIndex,
               onDestinationSelected: (index) {
@@ -61,7 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: const [
                     Icon(Icons.pets, size: 40, color: Colors.purple),
                     SizedBox(height: 8),
-                    Text("Pusa App", style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("Pusa App",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
@@ -77,30 +71,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         context.read<AuthBloc>().add(AuthLogoutRequested());
                       },
                     ),
-                    const Text("Logout", style: TextStyle(color: Colors.red, fontSize: 12)),
+                    const Text("Logout",
+                        style: TextStyle(color: Colors.red, fontSize: 12)),
                   ],
                 ),
               ),
               destinations: const [
                 NavigationRailDestination(
                   icon: Icon(Icons.dashboard),
-                  label: Text("Home"),
+                  label: Text("Dashboard"),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.pets),
                   label: Text("Cat Profile"),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.restaurant),
-                  label: Text("Feeding"),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.water_drop),
-                  label: Text("Hydration"),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.cleaning_services),
-                  label: Text("Litter"),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.history),
@@ -115,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const VerticalDivider(width: 1),
 
-            // ✅ Main content
+            // 🔹 Main content area
             Expanded(
               child: _pages[_selectedIndex],
             ),
