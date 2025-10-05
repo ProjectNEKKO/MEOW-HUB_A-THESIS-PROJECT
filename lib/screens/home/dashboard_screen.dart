@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
 import '../cats/cat_details_screen.dart';
@@ -78,52 +80,14 @@ class DashboardScreen extends StatelessWidget {
                                     const EdgeInsets.symmetric(horizontal: 10),
                                 child: GestureDetector(
                                   onTap: () {
-                                    showGeneralDialog(
+                                    showCupertinoModalBottomSheet(
                                       context: context,
-                                      barrierDismissible: true,
-                                      barrierLabel: "Close",
-                                      barrierColor:
-                                          Colors.black.withOpacity(0.2),
-                                      transitionDuration:
-                                          const Duration(milliseconds: 250),
-                                      pageBuilder: (_, __, ___) {
-                                        return Stack(
-                                          children: [
-                                            BackdropFilter(
-                                              filter: ImageFilter.blur(
-                                                  sigmaX: 8, sigmaY: 8),
-                                              child: Container(
-                                                  color: Colors.transparent),
-                                            ),
-                                            Align(
-                                              alignment: Alignment.bottomCenter,
-                                              child: FractionallySizedBox(
-                                                heightFactor: 0.7,
-                                                child: CatDetailsScreen(
-                                                  userId: userId,
-                                                  catId: catId,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                      transitionBuilder:
-                                          (_, animation, __, child) {
-                                        final curved = CurvedAnimation(
-                                            parent: animation,
-                                            curve: Curves.easeOut);
-                                        return SlideTransition(
-                                          position: Tween<Offset>(
-                                            begin: const Offset(0, 1),
-                                            end: Offset.zero,
-                                          ).animate(curved),
-                                          child: FadeTransition(
-                                            opacity: curved,
-                                            child: child,
-                                          ),
-                                        );
-                                      },
+                                      expand: true,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (context) => CatDetailsScreen(
+                                        userId: userId,
+                                        catId: catId,
+                                      ),
                                     );
                                   },
                                   child: Column(
@@ -148,7 +112,7 @@ class DashboardScreen extends StatelessWidget {
                                             boxShadow: [
                                               BoxShadow(
                                                 color: Colors.purple
-                                                    .withOpacity(0.3),
+                                                    .withAlpha(60),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 4),
                                               ),
@@ -286,7 +250,7 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-// 📦 DashboardCard Widget (unchanged)
+// 📦 DashboardCard Widget
 class DashboardCard extends StatelessWidget {
   final String title;
   final String subtitle;

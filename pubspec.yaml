@@ -26,6 +26,9 @@ dependencies:
   #Image Picker
   image_picker: ^1.2.0
 
+  #Modal Sheet
+  modal_bottom_sheet: ^3.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

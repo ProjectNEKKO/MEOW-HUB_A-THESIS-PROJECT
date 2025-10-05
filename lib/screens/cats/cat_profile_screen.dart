@@ -73,7 +73,6 @@ class CatProfileScreen extends StatelessWidget {
                               builder: (_) => CatDetailsScreen(
                                 userId: user.uid,
                                 catId: catDoc.id,
-                                catData: cat,
                               ),
                             ),
                           );
@@ -132,7 +131,6 @@ class CatProfileScreen extends StatelessWidget {
                                             builder: (_) => CatDetailsScreen(
                                               userId: user.uid,
                                               catId: catDoc.id,
-                                              catData: cat,
                                             ),
                                           ),
                                         );
