@@ -6,10 +6,11 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
+import 'package:pusa_app/screens/home/esp32_test_screen.dart';
 import '../cats/cat_details_screen.dart';
 import '../home/feeding_screen.dart';
 import '../home/hydration_screen.dart';
-import '../home/litter_screen.dart';
+//import '../home/litter_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -50,7 +51,6 @@ class DashboardScreen extends StatelessWidget {
                             return const Center(
                                 child: CircularProgressIndicator());
                           }
-
                           if (!snapshot.hasData ||
                               snapshot.data!.docs.isEmpty) {
                             return const Center(
@@ -60,24 +60,20 @@ class DashboardScreen extends StatelessWidget {
                               ),
                             );
                           }
-
                           final cats = snapshot.data!.docs;
-
                           return ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: cats.length,
                             itemBuilder: (context, index) {
                               final data =
-                                  cats[index].data() as Map<String, dynamic>?;
+                                cats[index].data() as Map<String, dynamic>?;
                               final catId = cats[index].id;
-
                               final catName =
-                                  data?["name"] as String? ?? "Unnamed";
+                                data?["name"] as String? ?? "Unnamed";
                               final photoUrl = data?["photoUrl"] as String? ?? "";
-
                               return Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
+                                  const EdgeInsets.symmetric(horizontal: 10),
                                 child: GestureDetector(
                                   onTap: () {
                                     showCupertinoModalBottomSheet(
@@ -159,11 +155,10 @@ class DashboardScreen extends StatelessWidget {
                     const Text(
                       "Dashboard Overview",
                       style: TextStyle(
-                          fontSize: 22, fontWeight: FontWeight.bold),
+                        fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
 
-                    // 🧹 Litter Box - Center
                     Center(
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.85,
@@ -177,16 +172,13 @@ class DashboardScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => const LitterScreen()),
+                                builder: (_) => const Esp32TestScreen()),
                             );
                           },
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // 🍽️ Feeder + 💧 Hydration
                     Row(
                       children: [
                         Expanded(
@@ -199,7 +191,7 @@ class DashboardScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const FeedingScreen()),
+                                  builder: (_) => const FeedingScreen()),
                               );
                             },
                           ),
@@ -215,16 +207,14 @@ class DashboardScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (_) => const HydrationScreen()),
+                                  builder: (_) => const HydrationScreen()),
                               );
                             },
                           ),
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 16),
-
                     DashboardCard(
                       title: "Activity Logs",
                       subtitle:
@@ -249,8 +239,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
-
-// 📦 DashboardCard Widget
 class DashboardCard extends StatelessWidget {
   final String title;
   final String subtitle;

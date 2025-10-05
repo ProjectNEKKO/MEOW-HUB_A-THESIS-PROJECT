@@ -29,6 +29,13 @@ dependencies:
   #Modal Sheet
   modal_bottom_sheet: ^3.0.0
 
+  #MQTT broker
+  mqtt_client: ^10.11.1
+
+  #Hive
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
