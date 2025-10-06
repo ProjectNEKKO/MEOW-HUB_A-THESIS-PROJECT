@@ -21,7 +21,21 @@ class CatProfileScreen extends StatelessWidget {
         final user = state.user;
 
         return Scaffold(
-          appBar: AppBar(title: const Text("My Cats")),
+          backgroundColor: const Color(0xFFFFFAF0), // 🧡 same as dashboard
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: const Text(
+              "My Cats 🐾",
+              style: TextStyle(
+                color: Colors.purple,
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+              ),
+            ),
+            centerTitle: true,
+          ),
+
           body: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection("users")
@@ -35,65 +49,79 @@ class CatProfileScreen extends StatelessWidget {
               }
 
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(child: Text("No cats yet. Add one!"));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.pets, size: 60, color: Colors.orange),
+                      SizedBox(height: 10),
+                      Text(
+                        "No cats yet. Add one!",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               final cats = snapshot.data!.docs;
 
-              return LayoutBuilder(
-                builder: (context, constraints) {
-                  final screenHeight = constraints.maxHeight;
-                  // Adjust card proportions based on available height
-                  final isShortScreen = screenHeight < 700;
-                  final aspectRatio = isShortScreen ? 0.9 : 0.75;
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: GridView.builder(
+                  itemCount: cats.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.78,
+                  ),
+                  itemBuilder: (context, index) {
+                    final catDoc = cats[index];
+                    final cat = catDoc.data() as Map<String, dynamic>;
 
-                  return GridView.builder(
-                    padding: const EdgeInsets.all(12),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      childAspectRatio: aspectRatio,
-                    ),
-                    itemCount: cats.length,
-                    itemBuilder: (context, index) {
-                      final catDoc = cats[index];
-                      final cat = catDoc.data() as Map<String, dynamic>;
+                    final imageUrl = (cat["photoUrl"] != null &&
+                            cat["photoUrl"].toString().isNotEmpty)
+                        ? cat["photoUrl"]
+                        : null;
 
-                      final imageUrl = (cat["photoUrl"] != null &&
-                              cat["photoUrl"].toString().isNotEmpty)
-                          ? cat["photoUrl"]
-                          : null;
-
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CatDetailsScreen(
-                                userId: user.uid,
-                                catId: catDoc.id,
-                              ),
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => CatDetailsScreen(
+                              userId: user.uid,
+                              catId: catDoc.id,
                             ),
-                          );
-                        },
-                        child: Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
                           ),
-                          elevation: 3,
+                        );
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 3,
+                        color: Colors.white,
+                        shadowColor: Colors.purple.withValues(alpha: .1),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 14),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              const SizedBox(height: 12),
-                              CircleAvatar(
-                                radius: 38,
-                                backgroundImage: imageUrl != null
-                                    ? NetworkImage(imageUrl)
-                                    : null,
-                                child: imageUrl == null
-                                    ? const Icon(Icons.pets, size: 38)
-                                    : null,
+                              Hero(
+                                tag: catDoc.id,
+                                child: CircleAvatar(
+                                  radius: 40,
+                                  backgroundImage: imageUrl != null
+                                      ? NetworkImage(imageUrl)
+                                      : null,
+                                  backgroundColor: Colors.orange.shade50,
+                                  child: imageUrl == null
+                                      ? const Icon(Icons.pets,
+                                          size: 40, color: Colors.orange)
+                                      : null,
+                                ),
                               ),
                               const SizedBox(height: 10),
                               Text(
@@ -101,83 +129,84 @@ class CatProfileScreen extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.purple,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              const SizedBox(height: 4),
                               Text(
                                 cat["breed"] ?? "Unknown Breed",
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.grey.shade700,
                                 ),
-                                textAlign: TextAlign.center,
                               ),
                               const Spacer(),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: [
-                                    TextButton.icon(
-                                      icon: const Icon(Icons.info, size: 18),
-                                      label: const Text("View"),
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => CatDetailsScreen(
-                                              userId: user.uid,
-                                              catId: catDoc.id,
-                                            ),
-                                          ),
-                                        );
-                                      },
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  TextButton.icon(
+                                    icon: const Icon(Icons.info_outline,
+                                        size: 18, color: Colors.orange),
+                                    label: const Text(
+                                      "View",
+                                      style: TextStyle(color: Colors.orange),
                                     ),
-                                    IconButton(
-                                      icon: const Icon(Icons.edit, size: 20),
-                                      onPressed: () async {
-                                        final updated = await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => EditCatScreen(
-                                              userId: user.uid,
-                                              catId: catDoc.id,
-                                              initialName: cat["name"] ?? "",
-                                              initialBreed: cat["breed"],
-                                              initialAge: cat["age"],
-                                              initialPhotoUrl: cat["photoUrl"],
-                                            ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => CatDetailsScreen(
+                                            userId: user.uid,
+                                            catId: catDoc.id,
                                           ),
-                                        );
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit,
+                                        size: 20, color: Colors.purple),
+                                    onPressed: () async {
+                                      final updated = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => EditCatScreen(
+                                            userId: user.uid,
+                                            catId: catDoc.id,
+                                            initialName: cat["name"] ?? "",
+                                            initialBreed: cat["breed"],
+                                            initialAge: cat["age"],
+                                            initialPhotoUrl: cat["photoUrl"],
+                                          ),
+                                        ),
+                                      );
 
-                                        if (updated == true && context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                                content: Text(
-                                                    "Cat updated successfully!")),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
+                                      if (updated == true && context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                "Cat updated successfully!"),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 8),
                             ],
                           ),
                         ),
-                      );
-                    },
-                  );
-                },
+                      ),
+                    );
+                  },
+                ),
               );
             },
           ),
-          floatingActionButton: FloatingActionButton(
+
+          floatingActionButton: FloatingActionButton.extended(
             backgroundColor: Colors.purple,
             foregroundColor: Colors.white,
             onPressed: () async {
@@ -192,7 +221,8 @@ class CatProfileScreen extends StatelessWidget {
                 );
               }
             },
-            child: const Icon(Icons.add),
+            icon: const Icon(Icons.add),
+            label: const Text("Add Cat"),
           ),
         );
       },

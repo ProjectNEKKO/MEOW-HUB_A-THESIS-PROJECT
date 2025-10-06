@@ -3,12 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AppUser {
   final String uid;
   final String email;
+  final String? displayName;
   final bool introCompleted;
   final DateTime? createdAt;
 
   AppUser({
     required this.uid,
     required this.email,
+    this.displayName,
     this.introCompleted = false,
     this.createdAt,
   });
@@ -28,6 +30,7 @@ class AppUser {
     return AppUser(
       uid: uid,
       email: data['email'] is String ? data['email'] as String : '',
+      displayName: data['displayName'],
       introCompleted: (data['introCompleted'] ?? false) as bool,
       createdAt: createdAt,
     );
@@ -40,6 +43,7 @@ class AppUser {
   Map<String, dynamic> toMap() {
     return {
       'email': email,
+      'displayName': displayName,
       'introCompleted': introCompleted,
       if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
     };
@@ -48,12 +52,14 @@ class AppUser {
   AppUser copyWith({
     String? uid,
     String? email,
+    String? displayName,
     bool? introCompleted,
     DateTime? createdAt,
   }) {
     return AppUser(
       uid: uid ?? this.uid,
       email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
       introCompleted: introCompleted ?? this.introCompleted,
       createdAt: createdAt ?? this.createdAt,
     );

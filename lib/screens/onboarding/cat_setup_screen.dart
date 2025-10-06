@@ -81,7 +81,10 @@ class _CatSetupScreenState extends State<CatSetupScreen> {
         });
       }
 
-      await userRef.update({"introCompleted": true});
+      await userRef.update({
+        "displayName": "${_nameCtrl.text.trim()}'s Parent",
+        "introCompleted": true
+      });
 
       if (mounted) {
         context.read<AuthBloc>().add(
