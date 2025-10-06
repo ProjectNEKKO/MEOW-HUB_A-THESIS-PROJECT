@@ -6,11 +6,11 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 import 'package:pusa_app/blocs/auth/auth_bloc.dart';
 import 'package:pusa_app/blocs/auth/auth_state.dart';
-import 'package:pusa_app/screens/home/esp32_test_screen.dart';
+//import 'package:pusa_app/screens/home/esp32_test_screen.dart';
 import '../cats/cat_details_screen.dart';
 import '../home/feeding_screen.dart';
 import '../home/hydration_screen.dart';
-//import '../home/litter_screen.dart';
+import '../home/litter_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -172,7 +172,7 @@ class DashboardScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const Esp32TestScreen()),
+                                builder: (_) => const LitterScreen()),
                             );
                           },
                         ),
