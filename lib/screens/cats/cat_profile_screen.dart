@@ -21,16 +21,16 @@ class CatProfileScreen extends StatelessWidget {
         final user = state.user;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFFFFAF0), // 🧡 same as dashboard
+          backgroundColor: const Color(0xFFFFF8F8), // 🩷 soft off-white-pink base
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
               "My Cats 🐾",
               style: TextStyle(
-                color: Colors.purple,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
+                color: Color(0xFF5A4FCF), // Lavender accent
+                fontWeight: FontWeight.w800,
+                fontSize: 24,
               ),
             ),
             centerTitle: true,
@@ -53,11 +53,15 @@ class CatProfileScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      Icon(Icons.pets, size: 60, color: Colors.orange),
-                      SizedBox(height: 10),
+                      Icon(Icons.pets, size: 70, color: Color(0xFF6B6BD6)),
+                      SizedBox(height: 12),
                       Text(
-                        "No cats yet. Add one!",
-                        style: TextStyle(fontSize: 16),
+                        "No cats yet. Add one to start tracking 🐱",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -72,8 +76,8 @@ class CatProfileScreen extends StatelessWidget {
                   itemCount: cats.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 18,
+                    crossAxisSpacing: 18,
                     childAspectRatio: 0.78,
                   ),
                   itemBuilder: (context, index) {
@@ -99,27 +103,28 @@ class CatProfileScreen extends StatelessWidget {
                       },
                       child: Card(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(24),
                         ),
-                        elevation: 3,
+                        elevation: 6,
+                        shadowColor: const Color(0xFFE5D9F2),
                         color: Colors.white,
-                        shadowColor: Colors.purple.withValues(alpha: .1),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 14),
+                              horizontal: 14, vertical: 16),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Hero(
                                 tag: catDoc.id,
                                 child: CircleAvatar(
-                                  radius: 40,
+                                  radius: 42,
                                   backgroundImage: imageUrl != null
                                       ? NetworkImage(imageUrl)
                                       : null,
-                                  backgroundColor: Colors.orange.shade50,
+                                  backgroundColor: const Color(0xFFFFEAF4),
                                   child: imageUrl == null
                                       ? const Icon(Icons.pets,
-                                          size: 40, color: Colors.orange)
+                                          size: 40, color: Color(0xFF6B6BD6))
                                       : null,
                                 ),
                               ),
@@ -127,9 +132,9 @@ class CatProfileScreen extends StatelessWidget {
                               Text(
                                 cat["name"] ?? "Unnamed Cat",
                                 style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.purple,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF6B6BD6),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -147,10 +152,12 @@ class CatProfileScreen extends StatelessWidget {
                                 children: [
                                   TextButton.icon(
                                     icon: const Icon(Icons.info_outline,
-                                        size: 18, color: Colors.orange),
+                                        size: 18, color: Color(0xFFFD9BB7)),
                                     label: const Text(
                                       "View",
-                                      style: TextStyle(color: Colors.orange),
+                                      style: TextStyle(
+                                          color: Color(0xFFFD9BB7),
+                                          fontWeight: FontWeight.w600),
                                     ),
                                     onPressed: () {
                                       Navigator.push(
@@ -166,7 +173,7 @@ class CatProfileScreen extends StatelessWidget {
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.edit,
-                                        size: 20, color: Colors.purple),
+                                        size: 20, color: Color(0xFF6B6BD6)),
                                     onPressed: () async {
                                       final updated = await Navigator.push(
                                         context,
@@ -207,8 +214,14 @@ class CatProfileScreen extends StatelessWidget {
           ),
 
           floatingActionButton: FloatingActionButton.extended(
-            backgroundColor: Colors.purple,
+            backgroundColor: const Color(0xFFFD9BB7), // 🩷 soft pink accent
             foregroundColor: Colors.white,
+            elevation: 6,
+            label: const Text(
+              "Add Cat",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            icon: const Icon(Icons.add),
             onPressed: () async {
               final added = await Navigator.push(
                 context,
@@ -221,8 +234,6 @@ class CatProfileScreen extends StatelessWidget {
                 );
               }
             },
-            icon: const Icon(Icons.add),
-            label: const Text("Add Cat"),
           ),
         );
       },

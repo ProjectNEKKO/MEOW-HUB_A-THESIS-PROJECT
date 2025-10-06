@@ -25,42 +25,44 @@ class DashboardScreen extends StatelessWidget {
         final userId = state.user.uid;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFFFFAF0),
+          backgroundColor: const Color(0xFFFFF9F9),
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final screenHeight = constraints.maxHeight;
 
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(18.0),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(minHeight: screenHeight),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 🐾 Welcome Header
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.pets, color: Colors.orange, size: 28),
-                              const SizedBox(width: 8),
-                              Text(
-                                "Welcome back, ${state.user.displayName ?? "Cat Parent"}!",
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        Row(
+                          children: [
+                            const Icon(Icons.pets, color: Color(0xFFF48FB1), size: 28),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Welcome back, ${state.user.displayName ?? "Cat Parent"}!",
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF5D4037),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 6),
                         Text(
                           "Here’s how your cats are doing today 🐾",
-                          style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF8D8D8D),
+                          ),
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
 
                         // 🐱 Cat Circles
                         SizedBox(
@@ -79,7 +81,7 @@ class DashboardScreen extends StatelessWidget {
                                 return const Center(
                                   child: Text(
                                     "No cats yet. Add one in Cat Profile.",
-                                    style: TextStyle(fontSize: 14),
+                                    style: TextStyle(fontSize: 14, color: Color(0xFF8D8D8D)),
                                   ),
                                 );
                               }
@@ -90,8 +92,8 @@ class DashboardScreen extends StatelessWidget {
                                 itemBuilder: (context, index) {
                                   final data = cats[index].data() as Map<String, dynamic>?;
                                   final catId = cats[index].id;
-                                  final catName = data?["name"] as String? ?? "Unnamed";
-                                  final photoUrl = data?["photoUrl"] as String? ?? "";
+                                  final catName = data?["name"] ?? "Unnamed";
+                                  final photoUrl = data?["photoUrl"] ?? "";
 
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -112,19 +114,18 @@ class DashboardScreen extends StatelessWidget {
                                         children: [
                                           Hero(
                                             tag: catId,
-                                            child: AnimatedContainer(
-                                              duration: const Duration(milliseconds: 300),
+                                            child: Container(
                                               padding: const EdgeInsets.all(3),
                                               decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
                                                 gradient: const LinearGradient(
-                                                  colors: [Color(0xFF9C27B0), Color(0xFFFF9800)],
+                                                  colors: [Color(0xFFF8BBD0), Color(0xFFB3E5FC)],
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomRight,
                                                 ),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Colors.purple.withAlpha(60),
+                                                    color: Colors.pinkAccent.withValues(alpha: .2),
                                                     blurRadius: 8,
                                                     offset: const Offset(0, 4),
                                                   ),
@@ -135,25 +136,24 @@ class DashboardScreen extends StatelessWidget {
                                                 backgroundImage: (photoUrl.isNotEmpty)
                                                     ? NetworkImage(photoUrl)
                                                     : null,
+                                                backgroundColor: const Color(0xFFFFF3E0),
                                                 child: (photoUrl.isEmpty)
-                                                    ? const Icon(Icons.pets, size: 35)
+                                                    ? const Icon(Icons.pets, color: Colors.pinkAccent, size: 32)
                                                     : null,
                                               ),
                                             ),
                                           ),
                                           const SizedBox(height: 6),
-                                          SizedBox(
-                                            width: 70,
-                                            child: Text(
-                                              catName,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              textAlign: TextAlign.center,
+                                          Text(
+                                            catName,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF5D4037),
                                             ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            textAlign: TextAlign.center,
                                           ),
                                         ],
                                       ),
@@ -165,11 +165,12 @@ class DashboardScreen extends StatelessWidget {
                           ),
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
 
                         // 🌈 Status Chips
                         Wrap(
-                          spacing: 10,
+                          spacing: 8,
+                          runSpacing: 6,
                           children: [
                             _buildStatusChip("Feeder", true),
                             _buildStatusChip("Hydration", true),
@@ -177,14 +178,24 @@ class DashboardScreen extends StatelessWidget {
                           ],
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 26),
 
-                        // 🧡 Today's Summary
+                        // 🩵 Summary Section
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.orange.shade50,
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFFFF3E0), Color(0xFFFFF9F9)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                             borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.pinkAccent.withValues(alpha: .05),
+                                blurRadius: 6,
+                              ),
+                            ],
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -198,22 +209,26 @@ class DashboardScreen extends StatelessWidget {
 
                         const SizedBox(height: 30),
 
-                        // 🐾 Section Divider
+                        // 🐾 Divider
                         Row(
                           children: const [
-                            Expanded(child: Divider(thickness: 1.2)),
+                            Expanded(child: Divider(thickness: 1.2, color: Color(0xFFF8BBD0))),
                             Padding(
                               padding: EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text("🐾", style: TextStyle(fontSize: 18)),
                             ),
-                            Expanded(child: Divider(thickness: 1.2)),
+                            Expanded(child: Divider(thickness: 1.2, color: Color(0xFFB3E5FC))),
                           ],
                         ),
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 24),
                         const Text(
                           "Dashboard Overview",
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF5D4037),
+                          ),
                         ),
                         const SizedBox(height: 16),
 
@@ -225,7 +240,7 @@ class DashboardScreen extends StatelessWidget {
                               title: "Litter Box",
                               subtitle: "Last cleaned: Yesterday 6:00 PM",
                               icon: Icons.cleaning_services,
-                              color: Colors.green,
+                              color: Color(0xFFF8BBD0),
                               isLarge: true,
                               onTap: () {
                                 Navigator.push(
@@ -244,13 +259,11 @@ class DashboardScreen extends StatelessWidget {
                                 title: "Feeding",
                                 subtitle: "Last meal: Today 8:30 AM",
                                 icon: Icons.restaurant,
-                                color: Colors.orange,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const FeedingScreen()),
-                                  );
-                                },
+                                color: Color(0xFFF48FB1),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const FeedingScreen()),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -259,13 +272,11 @@ class DashboardScreen extends StatelessWidget {
                                 title: "Hydration",
                                 subtitle: "Water level: 75%",
                                 icon: Icons.water_drop,
-                                color: Colors.blue,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => const HydrationScreen()),
-                                  );
-                                },
+                                color: Color(0xFFB3E5FC),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const HydrationScreen()),
+                                ),
                               ),
                             ),
                           ],
@@ -275,7 +286,7 @@ class DashboardScreen extends StatelessWidget {
                           title: "Activity Logs",
                           subtitle: "View feeding, hydration, and litter events",
                           icon: Icons.history,
-                          color: Colors.purple,
+                          color: Color(0xFFCE93D8),
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text("Use the Logs tab to view history")),
@@ -295,17 +306,14 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-// 🌿 Components
-
 Widget _buildStatusChip(String label, bool online) {
+  final color = online ? const Color(0xFFB3E5FC) : const Color(0xFFF8BBD0);
+  final icon = online ? Icons.check_circle : Icons.cancel;
+
   return Chip(
-    avatar: Icon(
-      online ? Icons.check_circle : Icons.cancel,
-      color: online ? Colors.green : Colors.red,
-      size: 18,
-    ),
+    avatar: Icon(icon, color: online ? Colors.blueAccent : Colors.pinkAccent, size: 18),
     label: Text("$label ${online ? "Online" : "Offline"}"),
-    backgroundColor: online ? Colors.green.shade50 : Colors.red.shade50,
+    backgroundColor: color.withValues(alpha: .3),
   );
 }
 
@@ -324,16 +332,15 @@ class _SummaryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Colors.orange, size: 28),
+        Icon(icon, color: Color(0xFFF48FB1), size: 28),
         const SizedBox(height: 6),
-        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF5D4037))),
+        Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF8D8D8D))),
       ],
     );
   }
 }
 
-// 🧩 Dashboard Card
 class DashboardCard extends StatefulWidget {
   final String title;
   final String subtitle;
@@ -372,14 +379,14 @@ class _DashboardCardState extends State<DashboardCard> {
         },
         onTapCancel: () => setState(() => _isTapped = false),
         child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 4,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
-                colors: [widget.color.withOpacity(0.06), Colors.white],
+                colors: [widget.color.withValues(alpha: .2), Colors.white],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -389,7 +396,7 @@ class _DashboardCardState extends State<DashboardCard> {
               children: [
                 CircleAvatar(
                   radius: widget.isLarge ? 35 : 28,
-                  backgroundColor: widget.color.withAlpha(40),
+                  backgroundColor: widget.color.withValues(alpha: .25),
                   child: Icon(widget.icon, size: widget.isLarge ? 35 : 28, color: widget.color),
                 ),
                 const SizedBox(width: 16),
@@ -399,15 +406,17 @@ class _DashboardCardState extends State<DashboardCard> {
                     children: [
                       Text(widget.title,
                           style: TextStyle(
-                              fontSize: widget.isLarge ? 20 : 18,
-                              fontWeight: FontWeight.bold)),
+                            fontSize: widget.isLarge ? 20 : 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF5D4037),
+                          )),
                       const SizedBox(height: 4),
                       Text(widget.subtitle,
-                          style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
+                          style: const TextStyle(fontSize: 14, color: Color(0xFF8D8D8D))),
                     ],
                   ),
                 ),
-                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF8D8D8D)),
               ],
             ),
           ),

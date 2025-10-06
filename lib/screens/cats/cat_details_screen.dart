@@ -21,180 +21,181 @@ class CatDetailsScreen extends StatelessWidget {
     final uid = (context.read<AuthBloc>().state as AuthAuthenticated).user.uid;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color(0xFFFFF8F5), // 🌸 soft off-white
       body: SafeArea(
-        top: false,
-        child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-            child: Container(
-              color: Colors.white.withValues(alpha: .95),
-              child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                future: FirebaseFirestore.instance
-                    .collection("users")
-                    .doc(uid)
-                    .collection("cats")
-                    .doc(catId)
-                    .get(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+        child: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          future: FirebaseFirestore.instance
+              .collection("users")
+              .doc(uid)
+              .collection("cats")
+              .doc(catId)
+              .get(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-                  final data = snapshot.data?.data();
-                  if (data == null) {
-                    return const Center(child: Text("No data found"));
-                  }
+            final data = snapshot.data?.data();
+            if (data == null) {
+              return const Center(child: Text("No data found"));
+            }
 
-                  final photoUrl = data["photoUrl"]?.toString() ?? "";
-                  final name = data["name"]?.toString() ?? "Unknown Cat";
-                  final breed = data["breed"]?.toString() ?? "Unknown";
-                  final age = data["age"]?.toString() ?? "N/A";
+            final photoUrl = data["photoUrl"]?.toString() ?? "";
+            final name = data["name"]?.toString() ?? "Unknown Cat";
+            final breed = data["breed"]?.toString() ?? "Unknown";
+            final age = data["age"]?.toString() ?? "N/A";
 
-                  return CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 12),
-                            Container(
-                              width: 50,
-                              height: 5,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[400],
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Hero(
-                              tag: catId,
-                              child: CircleAvatar(
-                                radius: 60,
-                                backgroundImage: (photoUrl.isNotEmpty)
-                                    ? NetworkImage(photoUrl)
-                                    : null,
-                                child: (photoUrl.isEmpty)
-                                    ? const Icon(Icons.pets, size: 60)
-                                    : null,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              name,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              breed,
-                              style: const TextStyle(
-                                  color: Colors.grey, fontSize: 16),
-                            ),
-                            const SizedBox(height: 20),
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 10,
-                              children: [
-                                Chip(
-                                  label: Text("Age: $age years"),
-                                  avatar: const Icon(Icons.cake, size: 18),
-                                ),
-                                const Chip(
-                                  label: Text("Healthy"),
-                                  avatar: Icon(Icons.favorite, size: 18),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            const Divider(),
-                          ],
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  // 🐱 Cat Image
+                  Hero(
+                    tag: catId,
+                    child: CircleAvatar(
+                      radius: 70,
+                      backgroundColor: const Color(0xFFFFE4E1), // light pink bg
+                      backgroundImage:
+                          (photoUrl.isNotEmpty) ? NetworkImage(photoUrl) : null,
+                      child: (photoUrl.isEmpty)
+                          ? const Icon(Icons.pets,
+                              size: 70, color: Color(0xFF6A1B9A))
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // 🐾 Cat Info
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4A148C), // deep muted purple
+                    ),
+                  ),
+                  Text(
+                    breed,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // 💗 Chips
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Chip(
+                        backgroundColor: const Color(0xFFB3E5FC),
+                        label: Text(
+                          "Age: $age years",
+                          style: const TextStyle(color: Colors.black87),
                         ),
+                        avatar: const Icon(Icons.cake, color: Colors.blueAccent),
                       ),
-                      SliverPadding(
-                        padding: const EdgeInsets.all(16.0),
-                        sliver: SliverToBoxAdapter(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Recent Activity",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 12),
-                              _buildActivityTile(
-                                  Icons.restaurant, "Last fed", "8:30 AM"),
-                              _buildActivityTile(Icons.water_drop, "Drank",
-                                  "150ml remaining"),
-                              _buildActivityTile(Icons.cleaning_services,
-                                  "Litter cleaned", "Yesterday 6:00 PM"),
-                              const SizedBox(height: 24),
-                              Center(
-                                child: ElevatedButton.icon(
-                                  onPressed: () async {
-                                    final updated = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => EditCatScreen(
-                                          userId: uid,
-                                          catId: catId,
-                                          initialName: name,
-                                          initialBreed: breed,
-                                          initialAge: int.tryParse(age),
-                                          initialPhotoUrl: photoUrl,
-                                        ),
-                                      ),
-                                    );
-                                    if (updated == true && context.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  "Cat updated successfully!")));
-                                    }
-                                  },
-                                  icon: const Icon(Icons.edit),
-                                  label: const Text("Edit Cat"),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.purple,
-                                    foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 24, vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 40),
-                            ],
-                          ),
-                        ),
+                      const Chip(
+                        backgroundColor: Color(0xFFFFB6C1),
+                        label: Text("Healthy",
+                            style: TextStyle(color: Colors.black87)),
+                        avatar: Icon(Icons.favorite, color: Colors.pinkAccent),
                       ),
                     ],
-                  );
-                },
+                  ),
+                  const SizedBox(height: 30),
+
+                  // 📘 Info Card
+                  _buildInfoCard([
+                    _buildInfoTile(
+                        Icons.restaurant, "Last fed", "8:30 AM (Today)"),
+                    _buildInfoTile(Icons.water_drop, "Drank", "150ml remaining"),
+                    _buildInfoTile(Icons.cleaning_services, "Litter cleaned",
+                        "Yesterday 6:00 PM"),
+                  ]),
+
+                  const SizedBox(height: 24),
+
+                  // ✏️ Edit Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final updated = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditCatScreen(
+                              userId: uid,
+                              catId: catId,
+                              initialName: name,
+                              initialBreed: breed,
+                              initialAge: int.tryParse(age),
+                              initialPhotoUrl: photoUrl,
+                            ),
+                          ),
+                        );
+                        if (updated == true && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Cat updated successfully!")),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text("Edit Cat"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFCE93D8), // soft purple
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildActivityTile(IconData icon, String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.purple.withValues(alpha: .1),
-          child: Icon(icon, color: Colors.purple),
-        ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
+  Widget _buildInfoCard(List<Widget> children) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .9),
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withValues(alpha: .1),
+            blurRadius: 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
+      child: Column(
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildInfoTile(IconData icon, String title, String subtitle) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: Colors.purple.withValues(alpha: .1),
+        child: Icon(icon, color: const Color(0xFF6A1B9A)),
+      ),
+      title: Text(title,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+      subtitle: Text(subtitle, style: const TextStyle(color: Colors.grey)),
     );
   }
 }
