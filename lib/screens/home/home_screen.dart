@@ -48,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: backgroundCream,
         body: Row(
           children: [
-            // 🌸 Soft Sakura Sidebar
             Container(
               decoration: const BoxDecoration(
                 color: primaryPink,
@@ -68,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 extended: true,
                 minExtendedWidth: 210,
                 backgroundColor: primaryPink,
-                indicatorColor: lavenderAccent.withOpacity(0.5),
+                indicatorColor: lavenderAccent.withValues(alpha: .5),
                 indicatorShape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -140,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, false),
                                   style: TextButton.styleFrom(
-                                    backgroundColor: secondaryBlue.withOpacity(0.3),
+                                    backgroundColor: secondaryBlue.withValues(alpha: .3),
                                     foregroundColor: textDark,
                                   ),
                                   child: const Text("Stay 😺"),
