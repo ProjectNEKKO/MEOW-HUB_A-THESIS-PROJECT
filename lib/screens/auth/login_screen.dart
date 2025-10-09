@@ -156,15 +156,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       const SizedBox(height: 40),
 
-                                      // Optional illustration placeholder
                                       Expanded(
                                         child: Align(
-                                          alignment: Alignment.bottomRight,
+                                          alignment: const Alignment(2.8, 8.5),
                                           child: Opacity(
-                                            opacity: 0.15,
+                                            opacity: 0.45,
                                             child: Image.asset(
-                                              'lib/assets/images/cat_login1.png', // replace with your asset
-                                              height: 200,
+                                              'assets/images/cat_login1.png',
+                                              height: 380,
                                               fit: BoxFit.contain,
                                             ),
                                           ),
