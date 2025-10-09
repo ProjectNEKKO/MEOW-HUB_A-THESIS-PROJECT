@@ -86,8 +86,8 @@ class _AddCatScreenState extends State<AddCatScreen> {
                 child: Card(
                   margin: const EdgeInsets.all(24),
                   elevation: 10,
-                  shadowColor: pastelPink.withOpacity(0.3),
-                  color: Colors.white.withOpacity(0.95),
+                  shadowColor: pastelPink.withValues(alpha: 0.3),
+                  color: Colors.white.withValues(alpha: .95),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
                   ),
@@ -116,7 +116,7 @@ class _AddCatScreenState extends State<AddCatScreen> {
                               onTap: _pickPhoto,
                               child: CircleAvatar(
                                 radius: 65,
-                                backgroundColor: pastelPink.withOpacity(0.4),
+                                backgroundColor: pastelPink.withValues(alpha: .4),
                                 backgroundImage: _photoFile != null
                                     ? FileImage(_photoFile!)
                                     : null,
@@ -176,7 +176,7 @@ class _AddCatScreenState extends State<AddCatScreen> {
 
           if (_isSaving)
             Container(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: .3),
               child: const Center(
                 child: CircularProgressIndicator(color: Colors.white),
               ),
@@ -199,7 +199,7 @@ class _AddCatScreenState extends State<AddCatScreen> {
               ? Icon(icon, color: Colors.pinkAccent.shade200)
               : null,
           filled: true,
-          fillColor: Colors.pink.shade50.withOpacity(0.4),
+          fillColor: Colors.pink.shade50.withValues(alpha: .4),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide.none,
@@ -217,7 +217,7 @@ class _AddCatScreenState extends State<AddCatScreen> {
 
   Widget _buildDropdown() {
     return DropdownButtonFormField<String>(
-      value: _gender,
+      initialValue: _gender,
       items: const [
         DropdownMenuItem(value: "Male", child: Text("Male")),
         DropdownMenuItem(value: "Female", child: Text("Female")),
@@ -228,7 +228,7 @@ class _AddCatScreenState extends State<AddCatScreen> {
         labelText: "Gender",
         prefixIcon: Icon(Icons.wc, color: Colors.pinkAccent.shade200),
         filled: true,
-        fillColor: Colors.pink.shade50.withOpacity(0.4),
+        fillColor: Colors.pink.shade50.withValues(alpha: .4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,

@@ -14,19 +14,41 @@ import 'package:pusa_app/screens/auth/login_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🧩 Initialize Firebase
-  await Firebase.initializeApp();
+  // Start Firebase asynchronously (don’t block UI)
+  final firebaseInit = Firebase.initializeApp();
 
-  // 🐝 Initialize Hive (local storage)
+  // Initialize Hive
   await Hive.initFlutter();
-  await Hive.openBox('ledBox');   // For ESP32 LED state
-  await Hive.openBox('ledLogs');  // For LED toggle history
+  await Hive.openBox('ledBox');
+  await Hive.openBox('ledLogs');
 
-  // 🔹 Check onboarding completion
+  // Get onboarding flag
   final prefs = await SharedPreferences.getInstance();
   final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
 
-  runApp(MyApp(hasSeenOnboarding: hasSeenOnboarding));
+  // Run app while Firebase finishes in background
+  runApp(
+    FutureBuilder(
+      future: firebaseInit,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return MyApp(hasSeenOnboarding: hasSeenOnboarding);
+        } else if (snapshot.hasError) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: Text('Firebase failed to initialize')),
+            ),
+          );
+        } else {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+      },
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

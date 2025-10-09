@@ -83,7 +83,7 @@ class _CatSetupScreenState extends State<CatSetupScreen> {
               : _breedCtrl.text.trim(),
           "gender": _gender ?? "Unknown",
           "birthday": _birthday,
-          "photoUrl": null, // TODO: upload _photo later
+          "photoUrl": null,
           "updatedAt": FieldValue.serverTimestamp(),
         });
       }

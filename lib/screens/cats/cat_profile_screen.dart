@@ -14,11 +14,22 @@ class CatProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
+        // 🩵 If not logged in, stop Firestore from running at all
         if (state is! AuthAuthenticated) {
-          return const Center(child: Text("Not logged in"));
+          return const Center(
+            child: Text(
+              "Please log in to view your cats 🐾",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          );
         }
 
         final user = state.user;
+        final userId = user.uid;
+
+        if (userId.isEmpty) {
+          return const Center(child: Text("Invalid user session."));
+        }
 
         return Scaffold(
           backgroundColor: const Color(0xFFFFF8F8), // 🩷 soft off-white-pink base
