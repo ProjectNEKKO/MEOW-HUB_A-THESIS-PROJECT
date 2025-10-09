@@ -67,12 +67,14 @@ class DashboardScreen extends StatelessWidget {
                         // 🐱 Cat Circles
                         SizedBox(
                           height: 120,
-                          child: StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection("users")
-                                .doc(userId)
-                                .collection("cats")
-                                .snapshots(),
+                          child: (userId.isEmpty)
+                              ? const Center(child: Text("Please log in to view your cats 🐾"))
+                              : StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection("users")
+                                      .doc(userId)
+                                      .collection("cats")
+                                      .snapshots(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const Center(child: CircularProgressIndicator());
